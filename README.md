@@ -66,9 +66,9 @@ mqtt_env_monitor/
 
 ## 当前进度
 
-| 日期 | 内容 |
+| 时间 | 内容 |
 | --- | --- |
-| 2026-06-08 | 完成项目目录规划、课程资料归档、README 初版和团队协作文档初始化。 |
+| 2026-06-08 15:44 | 完成项目目录规划、课程资料归档、README 初版和团队协作文档初始化。 |
 
 ## 后续计划
 
@@ -93,4 +93,3 @@ feat: add simulated mqtt node
 fix: handle mqtt reconnect failure
 test: add qos delivery test records
 ```
-
