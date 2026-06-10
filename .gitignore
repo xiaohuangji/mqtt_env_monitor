@@ -20,6 +20,9 @@ yarn-error.log*
 .vscode/launch.json
 .vscode/ipch/
 
+# Local tooling
+.claude/launch.json
+
 # Environment and secrets
 .env
 .env.*

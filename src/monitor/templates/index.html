@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MQTT 多节点环境监测 - Web 监控端</title>
+<style>
+  body { font-family: "Microsoft YaHei", "PingFang SC", sans-serif; margin: 24px; color: #222; background: #f7f8fa; }
+  h1 { font-size: 22px; margin: 0 0 12px; }
+  .meta { background: #fff; border: 1px solid #e3e6ea; border-radius: 6px; padding: 10px 14px; margin-bottom: 14px; font-size: 14px; line-height: 1.8; }
+  .meta b { color: #444; }
+  #conn.ok { color: #1a7f37; }
+  #conn.bad { color: #c62828; }
+  table { width: 100%; border-collapse: collapse; background: #fff; border: 1px solid #e3e6ea; border-radius: 6px; overflow: hidden; }
+  th, td { padding: 8px 12px; text-align: left; font-size: 14px; border-bottom: 1px solid #eef0f2; }
+  th { background: #f0f2f5; font-weight: 600; }
+  tr:last-child td { border-bottom: none; }
+  td.num { font-variant-numeric: tabular-nums; }
+  .status-ok { color: #1a7f37; font-weight: 600; }
+  .status-stale { color: #c62828; font-weight: 600; }
+  tr.stale td { color: #999; }
+  .hint { font-size: 13px; color: #777; margin-top: 10px; }
+  .empty { text-align: center; color: #999; padding: 24px 0; }
+</style>
+</head>
+<body>
+<h1>基于 MQTT 的多节点环境监测系统 - Web 监控端</h1>
+
+<div class="meta">
+  <b>MQTT Broker：</b><span id="broker">-</span>
+  ｜ <b>订阅主题：</b><span id="topic">-</span>
+  ｜ <b>页面连接：</b><span id="conn">连接中...</span><br>
+  <b>已接收消息：</b><span id="count">0</span> 条
+  ｜ <b>在线节点：</b><span id="nodes">0</span> 个
+  ｜ <b>无效消息：</b><span id="invalid">0</span> 条
+</div>
+
+<table>
+  <thead>
+    <tr>
+      <th>节点编号</th>
+      <th>数据类型</th>
+      <th>数据值</th>
+      <th>单位</th>
+      <th>上传时间</th>
+      <th>接收时间</th>
+      <th>消息序号</th>
+      <th>状态</th>
+    </tr>
+  </thead>
+  <tbody id="rows">
+    <tr><td class="empty" colspan="8">暂未收到数据</td></tr>
+  </tbody>
+</table>
+
+<p class="hint">说明：内部解析使用英文字段，页面按映射表显示中文数据类型，未配置中文名称的类型直接显示英文标识。
+超过 <span id="threshold">-</span> 秒未收到某节点某类数据时，对应行标记为“离线/过期”。</p>
+
+<script>
+  const entries = new Map();
+  let typeNames = {};
+  let offlineAfter = 15;
+  let clockOffset = 0;
+  let receivedTotal = 0;
+  let invalidTotal = 0;
+
+  function entryKey(e) { return e.node_id + "|" + e.data_type; }
+  function nowEpoch() { return Date.now() / 1000 + clockOffset; }
+  function setText(id, text) { document.getElementById(id).textContent = text; }
+
+  function setConn(text, ok) {
+    const el = document.getElementById("conn");
+    el.textContent = text;
+    el.className = ok ? "ok" : "bad";
+  }
+
+  function applySnapshot(snap) {
+    typeNames = snap.type_names || {};
+    offlineAfter = snap.offline_after;
+    clockOffset = snap.server_now - Date.now() / 1000;
+    receivedTotal = snap.received_total;
+    invalidTotal = snap.invalid_total;
+    entries.clear();
+    snap.entries.forEach((e) => entries.set(entryKey(e), e));
+    setText("broker", snap.broker);
+    setText("topic", snap.topic);
+    setText("threshold", offlineAfter);
+    render();
+  }
+
+  function applyUpdate(update) {
+    entries.set(entryKey(update.entry), update.entry);
+    receivedTotal = update.received_total;
+    render();
+  }
+
+  function render() {
+    const tbody = document.getElementById("rows");
+    tbody.replaceChildren();
+
+    const sorted = Array.from(entries.values()).sort((a, b) =>
+      a.node_id === b.node_id
+        ? String(a.data_type).localeCompare(String(b.data_type))
+        : String(a.node_id).localeCompare(String(b.node_id))
+    );
+
+    if (sorted.length === 0) {
+      const tr = document.createElement("tr");
+      const td = document.createElement("td");
+      td.className = "empty";
+      td.colSpan = 8;
+      td.textContent = "暂未收到数据";
+      tr.appendChild(td);
+      tbody.appendChild(tr);
+    }
+
+    const onlineNodes = new Set();
+    sorted.forEach((e) => {
+      const age = nowEpoch() - e.received_epoch;
+      const stale = age > offlineAfter;
+      if (!stale) onlineNodes.add(e.node_id);
+
+      const tr = document.createElement("tr");
+      if (stale) tr.className = "stale";
+      const cells = [
+        e.node_id,
+        typeNames[e.data_type] || e.data_type,
+        e.value === null || e.value === undefined ? "-" : String(e.value),
+        e.unit || "-",
+        e.timestamp || "-",
+        e.received_at,
+        e.seq === null || e.seq === undefined ? "-" : String(e.seq),
+      ];
+      cells.forEach((text, i) => {
+        const td = document.createElement("td");
+        if (i === 2 || i === 6) td.className = "num";
+        td.textContent = text;
+        tr.appendChild(td);
+      });
+
+      const tdStatus = document.createElement("td");
+      tdStatus.className = stale ? "status-stale" : "status-ok";
+      tdStatus.textContent = stale ? "离线/过期" : "在线";
+      tr.appendChild(tdStatus);
+      tbody.appendChild(tr);
+    });
+
+    setText("count", receivedTotal);
+    setText("invalid", invalidTotal);
+    setText("nodes", onlineNodes.size);
+  }
+
+  // Re-render every second so status flips to stale without new messages.
+  setInterval(render, 1000);
+
+  const source = new EventSource("/stream");
+  source.addEventListener("snapshot", (ev) => applySnapshot(JSON.parse(ev.data)));
+  source.addEventListener("update", (ev) => applyUpdate(JSON.parse(ev.data)));
+  source.onopen = () => setConn("已连接", true);
+  source.onerror = () => setConn("连接中断，自动重连中...", false);
+</script>
+</body>
+</html>
