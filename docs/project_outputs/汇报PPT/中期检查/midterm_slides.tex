@@ -1,0 +1,273 @@
+% !TeX program = xelatex
+% 编译：xelatex midterm_slides.tex（两遍）
+\documentclass[aspectratio=169,10pt]{ctexbeamer}
+
+\usetheme[progressbar=frametitle]{metropolis}
+\metroset{block=fill}
+\usepackage{booktabs}
+\usepackage{amssymb}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta, positioning}
+
+% Metropolis 标准字体：正文 Fira Sans Light，加粗 SemiBold；中文用微软雅黑
+\setsansfont{FiraSans-Light.otf}[BoldFont=FiraSans-SemiBold.otf]
+\setmonofont{FiraMono-Regular.otf}[Scale=0.85]
+\setCJKsansfont{Microsoft YaHei}[BoldFont={Microsoft YaHei Bold}]
+\setCJKmainfont{Microsoft YaHei}[BoldFont={Microsoft YaHei Bold}]
+
+\setbeamertemplate{frame numbering}[fraction]
+
+\setbeamercolor{takeaway}{bg=mLightBrown!12, fg=black!75}
+\setbeamercolor{codepanel}{bg=black!85, fg=black!4}
+
+% 底部要点条：每页一句结论
+\newcommand{\takeaway}[1]{%
+  \vfill
+  \begin{beamercolorbox}[rounded=true, center, sep=7pt]{takeaway}
+    \small #1
+  \end{beamercolorbox}}
+
+% 大数字展示：顶会风格的统计强调
+\newcommand{\bignum}[2]{%
+  \begin{center}
+    {\fontsize{30}{34}\selectfont\textbf{\textcolor{mLightBrown}{#1}}}\\[5pt]
+    {\small #2}
+  \end{center}}
+
+% JSON 键名高亮（深色面板内）
+\newcommand{\jkey}[1]{\textcolor{mLightBrown!85!white}{#1}}
+
+% 页面截图：文件存在则带细边框插图，否则显示虚线占位框
+\newcommand{\screenshotbox}[3]{%
+  \IfFileExists{#1}{%
+    {\setlength{\fboxsep}{0pt}\setlength{\fboxrule}{0.4pt}%
+     \fcolorbox{black!30}{white}{\includegraphics[width=\dimexpr\linewidth-0.8pt\relax]{#1}}}%
+  }{%
+    \begin{tikzpicture}
+      \draw[dashed, semithick, black!30] (0,0) rectangle (#2,#3);
+      \node[black!40] at (0.5*#2,0.5*#3) {\scriptsize 页面截图（待补充）};
+    \end{tikzpicture}%
+  }%
+}
+
+\title{基于 MQTT 的多节点环境监测系统设计}
+\subtitle{《数据通信与网络技术》课程设计 · 题目 12 · 中期检查}
+\author{胡艺瀚 \quad 孙博宇 \quad 韦煜城 \quad 曾家豪\\[4pt]
+  {\small 指导老师：和洁 \quad 傅攀峰 \quad 刘若辰}}
+\date{2026 年 6 月 11 日}
+
+\begin{document}
+
+\maketitle
+
+\begin{frame}{需求分析与设计指标}
+  \vspace{2pt}
+  面向校园实验室、农业大棚、智能家居等环境监测场景，\\
+  采集或模拟温度 · 湿度 · 光照 · 噪声四类数据。
+  \vspace{10pt}
+  \begin{columns}[T]
+    \begin{column}{0.50\textwidth}
+      \textbf{功能需求}
+      {\footnotesize
+      \begin{itemize}\itemsep=3pt
+        \item 多节点采集/模拟，上传周期可配置
+        \item 统一主题与消息格式，经 Broker 发布/转发
+        \item Web 监控端订阅并实时显示
+        \item 节点断线重连与异常情况分析
+        \item 测试证据全程留痕（日志 / 抓包 / 截图）
+      \end{itemize}}
+    \end{column}
+    \begin{column}{0.44\textwidth}
+      \textbf{性能指标}\\[4pt]
+      {\small
+      \begin{tabular}{ll}
+        \toprule
+        指标 & 目标 \\
+        \midrule
+        消息到达率 & $\geq$ 95\% \\
+        平均传输延迟 & $\leq$ 1 s \\
+        断线重连恢复 & $\leq$ 10 s \\
+        连续运行稳定性 & 30 min 无异常 \\
+        并发节点数 & $\geq$ 2 \\
+        \bottomrule
+      \end{tabular}}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{系统总体方案}
+  \vspace{8pt}
+  \begin{center}
+    \begin{tikzpicture}[
+        box/.style={draw=black!50, line width=0.5pt, rounded corners=2pt, fill=black!4,
+                    align=center, minimum height=0.9cm, inner sep=6pt, font=\small},
+        hub/.style={box, fill=mLightBrown!12, draw=mLightBrown},
+        arr/.style={-{Stealth[length=2.2mm]}, black!55, semithick}
+      ]
+      \node[box] (n1) {PC 模拟节点 node01};
+      \node[box, below=0.35cm of n1] (n2) {PC 模拟节点 node02};
+      \node[box, dashed, below=0.35cm of n2] (n3) {ESP32 节点 node03};
+      \node[hub, right=1.8cm of n2, minimum height=1.1cm] (broker) {MQTT Broker};
+      \node[box, right=1.8cm of broker, minimum height=1.1cm] (web) {Web 监控端\\\scriptsize\texttt{env\_monitor/+/+}};
+      \draw[arr] (n1.east) -- (broker);
+      \draw[arr] (n2.east) -- node[above, font=\tiny\ttfamily, black!50] {publish} (broker);
+      \draw[arr, dashed] (n3.east) -- (broker);
+      \draw[arr] (broker) -- node[above, font=\tiny\ttfamily, black!50] {subscribe} (web);
+    \end{tikzpicture}
+  \end{center}
+  \takeaway{先以软件节点打通链路，再接入 ESP32 —— 接口统一，监控端无需区分数据来源}
+\end{frame}
+
+\begin{frame}{MQTT 协议设计}
+  \vspace{4pt}
+  \begin{center}
+    \begin{tikzpicture}
+      \node[fill=mLightBrown!10, draw=mLightBrown!60, rounded corners=3pt,
+            inner xsep=14pt, inner ysep=8pt]
+        {\large\texttt{env\_monitor/\{node\_id\}/\{data\_type\}}};
+    \end{tikzpicture}\\[5pt]
+    {\small\color{black!60} 节点编号仅标识身份，不绑定数据类型}
+  \end{center}
+  \vspace{8pt}
+  \begin{columns}[T]
+    \begin{column}{0.46\textwidth}
+      \textbf{按需订阅}
+      {\footnotesize
+      \begin{itemize}
+        \item \texttt{+/+} \hfill 全部数据
+        \item \texttt{node01/+} \hfill 按节点
+        \item \texttt{+/temperature} \hfill 按类型
+      \end{itemize}}
+    \end{column}
+    \begin{column}{0.46\textwidth}
+      \textbf{统一消息字段}
+      {\footnotesize
+      \begin{itemize}
+        \item \texttt{node\_id · data\_type · value · unit}
+        \item \texttt{timestamp · seq}
+        \item 时间戳与序号为测试统计预留
+      \end{itemize}}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{实现：PC 模拟节点}
+  \vspace{2pt}
+  \begin{columns}[T]
+    \begin{column}{0.44\textwidth}
+      \vspace{12pt}
+      \begin{itemize}\itemsep=8pt
+        \item 编号 · 类型 · 周期 · QoS\\命令行可配置
+        \item 均值回归随机游走，\\数据平滑贴近真实环境
+        \item 断线自动重连，\\QoS 1 离线消息排队补发
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.52\textwidth}
+      \centering
+      \vspace{16pt}
+      \begin{tikzpicture}[x=0.215cm, y=1cm]
+        \draw[dashed, thin, black!35] (0,-0.2) -- (24,-0.2)
+          node[right, font=\tiny, black!50] {基准 26.0};
+        \draw[mLightBrown, line width=1pt] plot[smooth, tension=0.6] coordinates
+          {(0,-0.20)(1,0.04)(2,0.24)(3,0.00)(4,-0.32)(5,-0.60)(6,-0.36)(7,-0.04)
+           (8,0.32)(9,0.68)(10,0.52)(11,0.16)(12,-0.12)(13,-0.44)(14,-0.68)(15,-0.48)
+           (16,-0.16)(17,0.12)(18,0.40)(19,0.20)(20,-0.08)(21,-0.28)(22,0.00)(23,0.28)(24,0.08)};
+        \fill[mLightBrown] (24,0.08) circle (1.6pt);
+        \node[font=\tiny, black!50] at (12,-1.15) {均值回归随机游走 · 模拟温度（°C）};
+      \end{tikzpicture}
+    \end{column}
+  \end{columns}
+  \vspace{12pt}
+  \begin{beamercolorbox}[rounded=true, sep=7pt]{codepanel}
+    \scriptsize\ttfamily
+    \{\jkey{"node\_id"}:"node01", \jkey{"data\_type"}:"temperature", \jkey{"value"}:26.31, \jkey{"unit"}:"C",\\
+    \hspace*{1em}\jkey{"timestamp"}:"2026-06-10T15:09:45+08:00", \jkey{"seq"}:1\}
+  \end{beamercolorbox}
+\end{frame}
+
+\begin{frame}{实现：Web 监控端}
+  \vspace{2pt}
+  paho-mqtt 订阅 \texttt{env\_monitor/+/+}，SSE 实时推送至浏览器页面，无需刷新；\\
+  超过 15 s 未收到数据的行自动标记为\textcolor{red!70!black}{离线/过期}。
+  \vspace{10pt}
+  \begin{center}
+    \begin{minipage}{0.94\textwidth}
+      \screenshotbox{images/web_monitor_online_crop.png}{13.0cm}{3.6cm}
+    \end{minipage}\\[5pt]
+    {\footnotesize\color{black!60} 双节点并发上传 · 节点编号 / 中文类型 / 数值 / 上传与接收时间 / 状态实时刷新}
+  \end{center}
+\end{frame}
+
+\begin{frame}{实测结果：三项指标全部达标}
+  \vspace{16pt}
+  \begin{columns}[T]
+    \begin{column}{0.32\textwidth}
+      \bignum{100\%}{消息到达率\\ 双节点并发 48/48}
+    \end{column}
+    \begin{column}{0.32\textwidth}
+      \bignum{7 s}{断线重连恢复\\ 指标 $\leq$ 10 s}
+    \end{column}
+    \begin{column}{0.32\textwidth}
+      \bignum{0 条}{消息丢失\\ QoS 1 离线 12 条全部补发}
+    \end{column}
+  \end{columns}
+  \vspace{18pt}
+  \begin{center}
+    {\small\color{black!60} 发送与接收日志按 \texttt{seq} 逐条对照 · 测试证据全部入库可复现}
+  \end{center}
+\end{frame}
+
+\begin{frame}{工程化过程：GitHub 全程留痕}
+  \vspace{4pt}
+  \begin{columns}[T]
+    \begin{column}{0.24\textwidth}
+      \bignum{27}{commits}
+    \end{column}
+    \begin{column}{0.24\textwidth}
+      \bignum{8}{issues 关闭}
+    \end{column}
+    \begin{column}{0.24\textwidth}
+      \bignum{6}{PR 合并}
+    \end{column}
+    \begin{column}{0.24\textwidth}
+      \bignum{23}{文档}
+    \end{column}
+  \end{columns}
+  \vspace{8pt}
+  \begin{center}
+    \begin{minipage}{0.56\textwidth}
+      \screenshotbox{images/github_repo.png}{7.8cm}{3.6cm}
+    \end{minipage}\\[5pt]
+    {\footnotesize\color{black!60} 一个模块一个 Issue：分支开发 → PR 评审 → 合并主干 · 进度表与项目日志全程留痕}
+  \end{center}
+\end{frame}
+
+\begin{frame}{进度与下一步}
+  \vspace{4pt}
+  \begin{columns}[T]
+    \begin{column}{0.48\textwidth}
+      \textbf{中期已完成}
+      \begin{itemize}
+        \item[$\checkmark$] 需求 · 方案 · 协议三份设计文档
+        \item[$\checkmark$] 软件通信链路全通并实测
+        \item[$\checkmark$] ESP32 设计文档评审合并
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.48\textwidth}
+      \textbf{下一步}
+      \begin{itemize}
+        \item QoS 对比 · 延迟 · 到达率测试与抓包
+        \item ESP32 硬件节点接入
+        \item 课程设计报告与答辩材料
+      \end{itemize}
+    \end{column}
+  \end{columns}
+  \takeaway{中期目标全部完成，重心转向性能测试与真实硬件接入}
+\end{frame}
+
+\begin{frame}[standout]
+  谢谢各位老师\\[6pt]
+  {\small 恳请批评指正}
+\end{frame}
+
+\end{document}

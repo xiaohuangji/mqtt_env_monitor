@@ -23,6 +23,16 @@ yarn-error.log*
 # Local tooling
 .claude/launch.json
 
+# LaTeX build artifacts
+*.aux
+*.nav
+*.out
+*.snm
+*.toc
+*.vrb
+*.synctex.gz
+docs/project_outputs/汇报PPT/中期检查/midterm_slides.pdf
+
 # Environment and secrets
 .env
 .env.*
