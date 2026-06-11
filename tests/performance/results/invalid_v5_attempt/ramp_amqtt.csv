@@ -1,0 +1,7 @@
+broker,target_conns,reached_conns,rss_mb_avg,rss_mb_peak,cpu_pct_avg,cpu_pct_peak,status
+amqtt,100,100,28.1,28.1,0.1,1.0,ok
+amqtt,500,500,33.1,33.1,0.1,1.7,ok
+amqtt,1000,1000,39.0,39.0,0.2,4.3,ok
+amqtt,2000,2000,50.6,50.6,0.2,4.8,ok
+amqtt,5000,5000,85.4,85.4,0.4,7.3,ok
+amqtt,10000,10000,142.7,142.7,0.6,11.7,ok

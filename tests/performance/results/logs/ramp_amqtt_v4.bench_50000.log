@@ -1,0 +1,152 @@
+Start with 8 workers, addrs pool size: 1 and req interval: 8 ms 
+
+1s connect_succ total=848 rate=846.31/sec
+2s connect_succ total=1712 rate=864.00/sec
+3s connect_succ total=2584 rate=872.00/sec
+4s connect_succ total=3480 rate=896.00/sec
+5s connect_succ total=3512 rate=32.00/sec
+7s connect_succ total=3730 rate=109.00/sec
+8s connect_succ total=4997 rate=1267.00/sec
+9s connect_succ total=5946 rate=949.00/sec
+10s connect_succ total=6458 rate=512.00/sec
+11s connect_succ total=7962 rate=1504.00/sec
+12s connect_succ total=8345 rate=383.00/sec
+13s connect_succ total=9685 rate=1340.00/sec
+14s connect_succ total=10322 rate=637.00/sec
+15s connect_succ total=11890 rate=1568.00/sec
+17s connect_succ total=13592 rate=851.00/sec
+18s connect_succ total=14688 rate=1096.00/sec
+20s connect_succ total=15669 rate=490.50/sec
+21s connect_succ total=17261 rate=1592.00/sec
+22s connect_succ total=18021 rate=760.00/sec
+24s connect_succ total=19288 rate=633.50/sec
+25s connect_succ total=21181 rate=1893.00/sec
+26s connect_succ total=22152 rate=971.00/sec
+29s connect_succ total=24130 rate=659.33/sec
+30s connect_succ total=26029 rate=1899.00/sec
+31s connect_succ total=27205 rate=1176.00/sec
+32s connect_succ total=27253 rate=48.00/sec
+34s connect_succ total=27642 rate=194.50/sec
+35s connect_succ total=29989 rate=2347.00/sec
+36s connect_succ total=31651 rate=1662.00/sec
+37s connect_succ total=32533 rate=843.21/sec
+38s connect_succ total=33429 rate=939.20/sec
+39s connect_succ total=33536 rate=106.89/sec
+42s connect_succ total=34139 rate=201.07/sec
+43s connect_succ total=36495 rate=2356.00/sec
+44s connect_succ total=38276 rate=1779.22/sec
+45s connect_succ total=39175 rate=898.10/sec
+46s connect_succ total=40508 rate=1334.33/sec
+47s connect_succ total=40709 rate=201.20/sec
+51s connect_succ total=41458 rate=187.25/sec
+52s connect_succ total=43828 rate=2370.00/sec
+53s connect_succ total=45406 rate=1578.00/sec
+54s connect_succ total=46681 rate=1272.46/sec
+55s connect_succ total=48313 rate=1635.27/sec
+56s connect_succ total=49305 rate=992.00/sec
+57s connect_succ total=49438 rate=133.00/sec
+1m1s connect_succ total=49540 rate=25.50/sec
+1m4s connect_succ total=49901 rate=120.33/sec
+1m5s connect_succ total=49951 rate=50.00/sec
+client(31948): connect error - timeout
+client(31948): EXIT for {shutdown,timeout}
+client(699): connect error - timeout
+client(44450): connect error - timeout
+client(699): EXIT for {shutdown,timeout}
+client(44450): EXIT for {shutdown,timeout}
+client(700): connect error - timeout
+client(38201): connect error - timeout
+client(700): EXIT for {shutdown,timeout}
+client(38201): EXIT for {shutdown,timeout}
+client(31951): connect error - timeout
+client(38202): connect error - timeout
+client(25701): connect error - timeout
+client(19451): connect error - timeout
+client(31951): EXIT for {shutdown,timeout}
+client(38202): EXIT for {shutdown,timeout}
+client(25701): EXIT for {shutdown,timeout}
+client(19451): EXIT for {shutdown,timeout}
+client(19452): connect error - timeout
+client(44453): connect error - timeout
+client(31952): connect error - timeout
+client(19452): EXIT for {shutdown,timeout}
+client(44453): EXIT for {shutdown,timeout}
+client(31952): EXIT for {shutdown,timeout}
+client(31953): connect error - timeout
+client(38204): connect error - timeout
+client(703): connect error - timeout
+client(31953): EXIT for {shutdown,timeout}
+client(38204): EXIT for {shutdown,timeout}
+client(703): EXIT for {shutdown,timeout}
+client(25704): connect error - timeout
+client(6954): connect error - timeout
+client(25704): EXIT for {shutdown,timeout}
+client(6954): EXIT for {shutdown,timeout}
+client(705): connect error - timeout
+client(705): EXIT for {shutdown,timeout}
+client(706): connect error - timeout
+client(13206): connect error - timeout
+client(706): EXIT for {shutdown,timeout}
+client(13206): EXIT for {shutdown,timeout}
+client(31957): connect error - timeout
+client(19457): connect error - timeout
+client(707): connect error - timeout
+client(31957): EXIT for {shutdown,timeout}
+client(707): EXIT for {shutdown,timeout}
+client(19457): EXIT for {shutdown,timeout}
+client(19458): connect error - timeout
+client(6958): connect error - timeout
+client(31958): connect error - timeout
+client(19458): EXIT for {shutdown,timeout}
+client(6958): EXIT for {shutdown,timeout}
+client(31958): EXIT for {shutdown,timeout}
+client(6959): connect error - timeout
+client(6959): EXIT for {shutdown,timeout}
+client(38211): connect error - timeout
+client(44461): connect error - timeout
+client(38211): EXIT for {shutdown,timeout}
+client(44461): EXIT for {shutdown,timeout}
+client(13211): connect error - timeout
+client(6961): connect error - timeout
+client(13211): EXIT for {shutdown,timeout}
+client(6961): EXIT for {shutdown,timeout}
+client(25712): connect error - timeout
+client(6962): connect error - timeout
+client(25712): EXIT for {shutdown,timeout}
+client(6962): EXIT for {shutdown,timeout}
+client(13213): connect error - timeout
+client(713): connect error - timeout
+client(13213): EXIT for {shutdown,timeout}
+client(713): EXIT for {shutdown,timeout}
+client(6964): connect error - timeout
+client(13214): connect error - timeout
+client(6964): EXIT for {shutdown,timeout}
+client(13214): EXIT for {shutdown,timeout}
+client(715): connect error - timeout
+client(19465): connect error - timeout
+client(715): EXIT for {shutdown,timeout}
+client(19465): EXIT for {shutdown,timeout}
+client(13216): connect error - timeout
+client(716): connect error - timeout
+client(38217): connect error - timeout
+client(19466): connect error - timeout
+client(13216): EXIT for {shutdown,timeout}
+client(716): EXIT for {shutdown,timeout}
+client(38217): EXIT for {shutdown,timeout}
+client(19466): EXIT for {shutdown,timeout}
+client(6967): connect error - timeout
+client(19467): connect error - timeout
+client(38218): connect error - timeout
+client(6967): EXIT for {shutdown,timeout}
+client(19467): EXIT for {shutdown,timeout}
+client(38218): EXIT for {shutdown,timeout}
+client(6968): connect error - timeout
+client(25718): connect error - timeout
+client(31968): connect error - timeout
+client(6968): EXIT for {shutdown,timeout}
+client(25718): EXIT for {shutdown,timeout}
+client(31968): EXIT for {shutdown,timeout}
+1m7s connect_fail total=49 rate=0.73/sec
+=INFO REPORT==== 11-Jun-2026::20:56:59.211616 ===
+SIGTERM received - shutting down
+

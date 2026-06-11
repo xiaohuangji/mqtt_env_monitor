@@ -1,0 +1,74 @@
+Start with 8 workers, addrs pool size: 1 and req interval: 40 ms 
+
+1s pub total=196 rate=195.41/sec
+1s pub_succ total=196 rate=195.41/sec
+1s connect_succ total=20 rate=19.94/sec
+2s pub total=396 rate=200.00/sec
+2s pub_succ total=396 rate=200.00/sec
+3s pub total=596 rate=200.00/sec
+3s pub_succ total=596 rate=200.00/sec
+4s pub total=796 rate=200.00/sec
+4s pub_succ total=796 rate=200.00/sec
+5s pub total=996 rate=200.00/sec
+5s pub_succ total=996 rate=200.00/sec
+6s pub total=1196 rate=200.00/sec
+6s pub_succ total=1196 rate=200.00/sec
+7s pub total=1396 rate=200.00/sec
+7s pub_succ total=1396 rate=200.00/sec
+8s pub total=1596 rate=200.00/sec
+8s pub_succ total=1596 rate=200.00/sec
+9s pub total=1796 rate=200.00/sec
+9s pub_succ total=1796 rate=200.00/sec
+10s pub total=1996 rate=200.00/sec
+10s pub_succ total=1996 rate=200.00/sec
+11s pub total=2196 rate=200.00/sec
+11s pub_succ total=2196 rate=200.00/sec
+12s pub total=2396 rate=200.00/sec
+12s pub_succ total=2396 rate=200.00/sec
+13s pub total=2596 rate=200.00/sec
+13s pub_succ total=2596 rate=200.00/sec
+14s pub total=2796 rate=200.00/sec
+14s pub_succ total=2796 rate=200.00/sec
+15s pub total=2996 rate=200.00/sec
+15s pub_succ total=2996 rate=200.00/sec
+16s pub total=3196 rate=200.00/sec
+16s pub_succ total=3196 rate=200.00/sec
+17s pub total=3396 rate=200.00/sec
+17s pub_succ total=3396 rate=200.00/sec
+18s pub total=3596 rate=200.00/sec
+18s pub_succ total=3596 rate=200.00/sec
+19s pub total=3796 rate=200.00/sec
+19s pub_succ total=3796 rate=200.00/sec
+20s pub total=3996 rate=200.00/sec
+20s pub_succ total=3996 rate=200.00/sec
+21s pub total=4196 rate=200.00/sec
+21s pub_succ total=4196 rate=200.00/sec
+22s pub total=4396 rate=200.00/sec
+22s pub_succ total=4396 rate=200.00/sec
+23s pub total=4596 rate=200.00/sec
+23s pub_succ total=4596 rate=200.00/sec
+24s pub total=4796 rate=200.00/sec
+24s pub_succ total=4796 rate=200.00/sec
+25s pub total=4996 rate=200.00/sec
+25s pub_succ total=4996 rate=200.00/sec
+26s pub total=5196 rate=200.00/sec
+26s pub_succ total=5196 rate=200.00/sec
+27s pub total=5396 rate=200.00/sec
+27s pub_succ total=5396 rate=200.00/sec
+28s pub total=5596 rate=200.00/sec
+28s pub_succ total=5596 rate=200.00/sec
+29s pub total=5796 rate=200.00/sec
+29s pub_succ total=5796 rate=200.00/sec
+30s pub total=5996 rate=200.00/sec
+30s pub_succ total=5996 rate=200.00/sec
+31s pub total=6196 rate=200.00/sec
+31s pub_succ total=6196 rate=200.00/sec
+32s pub total=6396 rate=200.00/sec
+32s pub_succ total=6396 rate=200.00/sec
+33s pub total=6596 rate=200.00/sec
+33s pub_succ total=6596 rate=200.00/sec
+34s pub total=6796 rate=200.00/sec
+34s pub_succ total=6796 rate=200.00/sec
+=INFO REPORT==== 11-Jun-2026::20:57:44.009039 ===
+SIGTERM received - shutting down
+

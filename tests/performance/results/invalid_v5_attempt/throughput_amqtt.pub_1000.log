@@ -1,0 +1,5 @@
+Start with 8 workers, addrs pool size: 1 and req interval: 8 ms 
+
+=INFO REPORT==== 11-Jun-2026::20:39:54.590209 ===
+SIGTERM received - shutting down
+

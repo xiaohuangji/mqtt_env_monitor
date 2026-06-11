@@ -1,0 +1,62 @@
+Start with 8 workers, addrs pool size: 1 and req interval: 8 ms 
+
+1s connect_succ total=840 rate=838.32/sec
+2s connect_succ total=1704 rate=864.00/sec
+3s connect_succ total=2568 rate=864.00/sec
+4s connect_succ total=3456 rate=888.00/sec
+5s connect_succ total=4336 rate=880.00/sec
+6s connect_succ total=5224 rate=888.00/sec
+7s connect_succ total=6120 rate=896.00/sec
+8s connect_succ total=7008 rate=888.00/sec
+9s connect_succ total=7896 rate=888.00/sec
+10s connect_succ total=8760 rate=864.00/sec
+11s connect_succ total=9648 rate=888.00/sec
+12s connect_succ total=10536 rate=888.00/sec
+13s connect_succ total=11432 rate=896.00/sec
+14s connect_succ total=12320 rate=888.00/sec
+15s connect_succ total=13208 rate=888.00/sec
+16s connect_succ total=14096 rate=888.00/sec
+17s connect_succ total=14984 rate=888.00/sec
+18s connect_succ total=15872 rate=888.00/sec
+19s connect_succ total=16744 rate=872.00/sec
+20s connect_succ total=17632 rate=888.00/sec
+21s connect_succ total=18520 rate=888.00/sec
+22s connect_succ total=19408 rate=888.00/sec
+23s connect_succ total=20296 rate=888.00/sec
+24s connect_succ total=21192 rate=896.00/sec
+25s connect_succ total=22080 rate=888.00/sec
+26s connect_succ total=22968 rate=888.00/sec
+27s connect_succ total=23856 rate=888.00/sec
+28s connect_succ total=24744 rate=888.00/sec
+29s connect_succ total=25632 rate=888.00/sec
+30s connect_succ total=26520 rate=888.00/sec
+31s connect_succ total=27408 rate=888.00/sec
+32s connect_succ total=28296 rate=888.00/sec
+33s connect_succ total=29188 rate=892.00/sec
+34s connect_succ total=30080 rate=892.00/sec
+35s connect_succ total=30968 rate=888.00/sec
+36s connect_succ total=31856 rate=888.00/sec
+37s connect_succ total=32729 rate=871.26/sec
+38s connect_succ total=33590 rate=862.73/sec
+39s connect_succ total=34464 rate=873.13/sec
+40s connect_succ total=35345 rate=881.00/sec
+41s connect_succ total=36209 rate=864.00/sec
+42s connect_succ total=37071 rate=862.00/sec
+43s connect_succ total=37933 rate=862.00/sec
+44s connect_succ total=38805 rate=872.87/sec
+45s connect_succ total=39678 rate=873.00/sec
+46s connect_succ total=40545 rate=867.00/sec
+47s connect_succ total=41412 rate=867.00/sec
+48s connect_succ total=42283 rate=871.00/sec
+49s connect_succ total=43144 rate=861.00/sec
+50s connect_succ total=44023 rate=879.00/sec
+51s connect_succ total=44884 rate=859.28/sec
+52s connect_succ total=45746 rate=863.73/sec
+53s connect_succ total=46609 rate=863.00/sec
+54s connect_succ total=47480 rate=871.00/sec
+55s connect_succ total=48344 rate=864.00/sec
+56s connect_succ total=49217 rate=873.00/sec
+57s connect_succ total=50000 rate=783.00/sec
+=INFO REPORT==== 11-Jun-2026::18:20:43.286070 ===
+SIGTERM received - shutting down
+

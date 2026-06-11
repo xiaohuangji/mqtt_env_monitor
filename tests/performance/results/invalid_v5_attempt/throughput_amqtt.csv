@@ -1,0 +1,6 @@
+broker,offered_rate,pub_conns,qos,payload_bytes,rss_mb_avg,cpu_pct_avg,cpu_pct_peak,status
+amqtt,500,50,1,118,504.1,0.1,1.0,ok
+amqtt,1000,100,1,118,504.1,0.0,1.0,ok
+amqtt,2000,200,1,118,504.1,0.0,0.2,ok
+amqtt,5000,500,1,118,261.7,0.9,21.5,ok
+amqtt,10000,1000,1,118,261.7,0.0,0.5,ok

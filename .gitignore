@@ -44,6 +44,9 @@ tmp/
 temp/
 .cache/
 
+# Keep performance experiment evidence logs
+!tests/performance/results/**/*.log
+
 # OS files
 .DS_Store
 Thumbs.db

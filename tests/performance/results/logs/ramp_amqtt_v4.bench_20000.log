@@ -1,0 +1,26 @@
+Start with 8 workers, addrs pool size: 1 and req interval: 8 ms 
+
+1s connect_succ total=808 rate=806.39/sec
+2s connect_succ total=1672 rate=864.00/sec
+3s connect_succ total=1936 rate=264.00/sec
+4s connect_succ total=2570 rate=634.00/sec
+5s connect_succ total=3648 rate=1078.00/sec
+6s connect_succ total=4524 rate=876.00/sec
+7s connect_succ total=5608 rate=1084.00/sec
+8s connect_succ total=6095 rate=487.00/sec
+9s connect_succ total=6924 rate=829.00/sec
+10s connect_succ total=8417 rate=1493.00/sec
+11s connect_succ total=8663 rate=246.00/sec
+12s connect_succ total=10346 rate=1683.00/sec
+13s connect_succ total=10578 rate=232.00/sec
+14s connect_succ total=11813 rate=1235.00/sec
+15s connect_succ total=13076 rate=1263.00/sec
+17s connect_succ total=14548 rate=736.00/sec
+18s connect_succ total=15675 rate=1127.00/sec
+19s connect_succ total=16196 rate=521.00/sec
+21s connect_succ total=18053 rate=928.50/sec
+22s connect_succ total=19372 rate=1319.00/sec
+23s connect_succ total=20000 rate=628.00/sec
+=INFO REPORT==== 11-Jun-2026::20:55:35.070380 ===
+SIGTERM received - shutting down
+

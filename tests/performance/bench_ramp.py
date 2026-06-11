@@ -41,6 +41,9 @@ def parse_args() -> argparse.Namespace:
                         help="Comma-separated target connection counts.")
     parser.add_argument("--conn-interval-ms", type=int, default=1,
                         help="emqtt_bench -i value (1 ms ~= 1000 conns/s).")
+    parser.add_argument("--proto-version", type=int, default=5, choices=(3, 4, 5),
+                        help="MQTT protocol version for bench clients "
+                             "(4 = 3.1.1, required for amqtt).")
     parser.add_argument("--hold", type=float, default=30.0,
                         help="Seconds to hold and sample at each step.")
     parser.add_argument("--reach-fraction", type=float, default=0.98,
@@ -105,7 +108,7 @@ def run_step(args: argparse.Namespace, target: int, writer: csv.writer, handle) 
 
     bench_log = Path(args.output).with_suffix(f".bench_{target}.log")
     cmd = (f"{args.bench} conn -h {args.host} -p {args.port} -c {target} "
-           f"-i {args.conn_interval_ms}")
+           f"-i {args.conn_interval_ms} -V {args.proto_version}")
     print(f"[step {target}] {cmd}")
     with open(bench_log, "w") as log_handle:
         bench = subprocess.Popen(shlex.split(cmd), stdout=log_handle, stderr=subprocess.STDOUT)

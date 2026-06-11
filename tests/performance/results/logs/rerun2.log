@@ -1,0 +1,22 @@
+[step 1000] /opt/emqtt-bench/bin/emqtt_bench conn -h 127.0.0.1 -p 1885 -c 1000 -i 1 -V 4
+[step 1000] reached=1000 status=ok rss_avg=82.3MB cpu_avg=0.9%
+[step 5000] /opt/emqtt-bench/bin/emqtt_bench conn -h 127.0.0.1 -p 1885 -c 5000 -i 1 -V 4
+[step 5000] reached=5000 status=ok rss_avg=304.0MB cpu_avg=2.2%
+[step 10000] /opt/emqtt-bench/bin/emqtt_bench conn -h 127.0.0.1 -p 1885 -c 10000 -i 1 -V 4
+[step 10000] reached=10000 status=ok rss_avg=579.6MB cpu_avg=3.7%
+[step 20000] /opt/emqtt-bench/bin/emqtt_bench conn -h 127.0.0.1 -p 1885 -c 20000 -i 1 -V 4
+[step 20000] reached=20000 status=ok rss_avg=1133.0MB cpu_avg=4.8%
+[step 50000] /opt/emqtt-bench/bin/emqtt_bench conn -h 127.0.0.1 -p 1885 -c 50000 -i 1 -V 4
+[step 50000] reached=49951 status=ok rss_avg=2788.6MB cpu_avg=23.0%
+[ramp] results written to results/ramp_amqtt_v4.csv
+[rate 200] conns=20 interval=100ms
+[rate 200] cpu_avg=5.2% status=ok
+[rate 500] conns=50 interval=100ms
+[rate 500] cpu_avg=11.8% status=ok
+[rate 1000] conns=100 interval=100ms
+[rate 1000] cpu_avg=22.4% status=ok
+[rate 2000] conns=200 interval=100ms
+[rate 2000] cpu_avg=45.5% status=ok
+[rate 5000] conns=500 interval=100ms
+[rate 5000] cpu_avg=98.8% status=ok
+[throughput] results written to results/throughput_amqtt_v4.csv
