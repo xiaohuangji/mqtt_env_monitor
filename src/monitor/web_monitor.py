@@ -16,9 +16,14 @@ import json
 import queue
 import threading
 from datetime import datetime, timedelta, timezone
+from pathlib import Path
 
 import paho.mqtt.client as mqtt
 from flask import Flask, Response, jsonify, render_template
+
+# Sizing-calculator coefficients, calibrated by the capture/load experiments
+# (see docs/project_outputs/课程设计报告/网络负载与成本建模.md §10).
+CALC_CONFIG_PATH = Path(__file__).resolve().parent / "calc_config.json"
 
 
 CN_TZ = timezone(timedelta(hours=8))
@@ -250,6 +255,14 @@ def build_app(state: MonitorState) -> Flask:
     @app.get("/api/data")
     def api_data() -> Response:
         return jsonify(state.snapshot())
+
+    @app.get("/calculator")
+    def calculator() -> str:
+        return render_template("calculator.html")
+
+    @app.get("/api/calc_config")
+    def api_calc_config() -> Response:
+        return jsonify(json.loads(CALC_CONFIG_PATH.read_text(encoding="utf-8")))
 
     @app.get("/stream")
     def stream() -> Response:

@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MQTT 多节点环境监测 - 需求计算器</title>
+<style>
+  body { font-family: "Microsoft YaHei", "PingFang SC", sans-serif; margin: 24px; color: #222; background: #f7f8fa; }
+  h1 { font-size: 22px; margin: 0 0 12px; }
+  h2 { font-size: 16px; margin: 18px 0 8px; }
+  .panel { background: #fff; border: 1px solid #e3e6ea; border-radius: 6px; padding: 14px 16px; margin-bottom: 14px; font-size: 14px; }
+  .presets button { margin: 0 8px 8px 0; padding: 6px 12px; font-size: 13px; border: 1px solid #c8cdd4; border-radius: 4px; background: #f0f2f5; cursor: pointer; }
+  .presets button:hover { background: #e3e6ea; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 10px 18px; }
+  label { display: block; font-size: 13px; color: #555; margin-bottom: 3px; }
+  input, select { width: 100%; box-sizing: border-box; padding: 6px 8px; font-size: 14px; border: 1px solid #c8cdd4; border-radius: 4px; background: #fff; }
+  table { width: 100%; border-collapse: collapse; background: #fff; }
+  th, td { padding: 8px 12px; text-align: left; font-size: 14px; border-bottom: 1px solid #eef0f2; }
+  th { background: #f0f2f5; font-weight: 600; width: 220px; }
+  tr:last-child td, tr:last-child th { border-bottom: none; }
+  td b { color: #0b5fa5; }
+  .reco { font-size: 15px; }
+  .reco b { color: #1a7f37; font-size: 17px; }
+  .hint { font-size: 13px; color: #777; margin-top: 10px; line-height: 1.7; }
+  a { color: #0b5fa5; text-decoration: none; }
+</style>
+</head>
+<body>
+<h1>需求计算器：输入需求参数 → 输出网络负载与服务器配置</h1>
+
+<div class="panel presets">
+  <b>场景预设：</b><br>
+  <button onclick="preset(20,4,30,1,'json',2,30)">① 教室/实验室</button>
+  <button onclick="preset(50,3,60,1,'json',2,30)">② 农业大棚</button>
+  <button onclick="preset(10,3,10,0,'json',3,7)">③ 智能家居</button>
+  <button onclick="preset(30,1,5,1,'json',2,30)">④ 噪声监测网格</button>
+  <button onclick="preset(100,4,30,1,'json',5,30)">⑤ 公共空间提示</button>
+  <button onclick="preset(20000,4,60,1,'json-min',10,30)">⑥ 校园全域（万级）</button>
+</div>
+
+<div class="panel">
+  <div class="grid">
+    <div><label>节点数 N</label><input id="n" type="number" min="1" value="20"></div>
+    <div><label>每节点测量量数 M（1–4）</label><input id="m" type="number" min="1" max="8" value="4"></div>
+    <div><label>上传周期 T（秒）</label><input id="t" type="number" min="0.1" step="0.1" value="30"></div>
+    <div><label>QoS 等级</label><select id="qos"><option value="0">0</option><option value="1" selected>1</option><option value="2">2</option></select></div>
+    <div><label>payload 格式</label><select id="fmt"><option value="json" selected>json</option><option value="json-min">json-min</option><option value="msgpack">msgpack</option></select></div>
+    <div><label>订阅端数量 S</label><input id="s" type="number" min="1" value="2"></div>
+    <div><label>协议版本</label><select id="ver"><option value="5" selected>MQTT 5.0</option><option value="311">MQTT 3.1.1</option></select></div>
+    <div><label>Topic Alias（仅 5.0）</label><select id="alias"><option value="on" selected>开启</option><option value="off">关闭</option></select></div>
+    <div><label>数据保留天数</label><input id="dr" type="number" min="0" value="30"></div>
+  </div>
+</div>
+
+<h2>计算结果</h2>
+<table id="out">
+  <tr><th>消息率 R</th><td id="o_rate">-</td></tr>
+  <tr><th>单条消息开销（节点→Broker）</th><td id="o_bmsg">-</td></tr>
+  <tr><th>节点侧上行带宽（含心跳）</th><td id="o_up">-</td></tr>
+  <tr><th>订阅端转发带宽</th><td id="o_down">-</td></tr>
+  <tr><th>服务器总带宽 W</th><td id="o_total">-</td></tr>
+  <tr><th>月流量</th><td id="o_month">-</td></tr>
+  <tr><th>内存需求（含 1.5 安全系数）</th><td id="o_ram">-</td></tr>
+  <tr><th>CPU 需求（含 1.5 安全系数）</th><td id="o_cpu">-</td></tr>
+  <tr><th>磁盘需求（保留期原始数据 + 系统盘）</th><td id="o_disk">-</td></tr>
+  <tr><th class="reco">推荐服务器配置</th><td class="reco" id="o_reco">-</td></tr>
+  <tr><th>整机参考价（2026-06 市场量级）</th><td id="o_price">-</td></tr>
+  <tr><th>带宽建议</th><td id="o_bw">-</td></tr>
+</table>
+
+<p class="hint">
+  系数来自 2026-06-11 抓包与压测实验校准（详见《网络负载与成本建模》《性能实验数据表》），
+  计算方法与文档第 4–7 节公式一一对应；本计算器只覆盖网络侧，节点硬件与供电成本暂不纳入。<br>
+  <a href="/">← 返回监控页</a>
+</p>
+
+<script>
+let cfg = null;
+
+const TIERS = [
+  { label: "1C1G",  cores: 1,  ramMb: 1024,   price: "0–300 元（树莓派级/闲置旧机）" },
+  { label: "1C2G",  cores: 1,  ramMb: 2048,   price: "0–300 元（树莓派级/闲置旧机）" },
+  { label: "2C2G",  cores: 2,  ramMb: 2048,   price: "300–600 元（入门迷你主机/旧机）" },
+  { label: "2C4G",  cores: 2,  ramMb: 4096,   price: "600–1000 元（N100 级迷你主机）" },
+  { label: "4C8G",  cores: 4,  ramMb: 8192,   price: "1000–2000 元（迷你主机/入门塔式）" },
+  { label: "8C16G", cores: 8,  ramMb: 16384,  price: "2000–4000 元（塔式/二手服务器）" },
+  { label: "16C32G", cores: 16, ramMb: 32768, price: "4000–8000 元（工作站/二手服务器）" },
+];
+
+function val(id) { return document.getElementById(id).value; }
+function num(id) { return parseFloat(val(id)); }
+function setOut(id, text) { document.getElementById(id).textContent = text; }
+
+function fmtBandwidth(bytesPerSec) {
+  const bps = bytesPerSec * 8;
+  if (bps >= 1e6) return (bps / 1e6).toFixed(1) + " Mbps";
+  return (bps / 1e3).toFixed(1) + " kbps";
+}
+
+function fmtVolume(bytes) {
+  if (bytes >= 1e12) return (bytes / 1e12).toFixed(2) + " TB";
+  return (bytes / 1e9).toFixed(1) + " GB";
+}
+
+function compute() {
+  if (!cfg) return null;
+  const n = num("n"), m = num("m"), t = num("t"), s = num("s"), dr = num("dr");
+  const qos = val("qos"), fmt = val("fmt");
+  const aliasOn = val("ver") === "5" && val("alias") === "on";
+  if (!(n > 0 && m > 0 && t > 0 && s > 0 && dr >= 0)) return null;
+
+  let bPub = cfg.b_pub.qos1[fmt];
+  let bDel = cfg.b_deliver[fmt];
+  if (qos === "0") { bPub += cfg.b_pub.qos0_delta; bDel += cfg.b_pub.qos0_delta; }
+  if (qos === "2") { bPub += cfg.b_pub.qos2_delta; bDel += cfg.b_pub.qos2_delta; }
+  if (!aliasOn) bPub += cfg.b_pub.alias_off_delta;
+
+  const rate = n * m / t;
+  const heartbeat = t >= cfg.keepalive_interval_s ? n * cfg.keepalive_bytes / cfg.keepalive_interval_s : 0;
+  const uplink = rate * bPub + heartbeat;
+  const deliver = rate * s * bDel;
+  const total = uplink + deliver;
+  const monthly = total * 86400 * 30;
+
+  const ramMb = ((n + s) * cfg.mem_per_conn_kb / 1024 + cfg.mem_base_mb) * cfg.safety_factor;
+  const cores = rate * (1 + s) / cfg.msgs_per_core * cfg.safety_factor;
+  const diskGb = rate * cfg.record_bytes * 86400 * dr / 1e9 + 20;
+  const bwMbps = total * 8 / 1e6 * cfg.bandwidth_safety;
+
+  let tierIdx = TIERS.findIndex((x) => x.cores >= Math.max(1, Math.ceil(cores)) && x.ramMb >= ramMb);
+  if (tierIdx < 0) tierIdx = TIERS.length;  // beyond table
+  let bumped = false;
+  if (tierIdx < TIERS.length && diskGb > 100) { tierIdx += 1; bumped = true; }  // I/O headroom for big storage
+  const tier = tierIdx < TIERS.length ? TIERS[tierIdx] : null;
+
+  return { rate, bPub, uplink, deliver, total, monthly, ramMb, cores, diskGb, bwMbps, tier, bumped };
+}
+
+function render() {
+  const r = compute();
+  if (!r) return;
+  setOut("o_rate", r.rate.toFixed(1) + " 条/秒");
+  setOut("o_bmsg", r.bPub.toFixed(1) + " 字节/条（含 TCP/IP 头、QoS 交互与 ACK 分摊）");
+  setOut("o_up", fmtBandwidth(r.uplink) + "（" + Math.round(r.uplink) + " B/s）");
+  setOut("o_down", fmtBandwidth(r.deliver) + "（订阅端 × " + val("s") + "）");
+  setOut("o_total", fmtBandwidth(r.total));
+  setOut("o_month", fmtVolume(r.monthly));
+  setOut("o_ram", Math.ceil(r.ramMb) + " MB");
+  setOut("o_cpu", r.cores < 0.1 ? "< 0.1 核" : r.cores.toFixed(1) + " 核");
+  setOut("o_disk", r.diskGb.toFixed(1) + " GB（保留 " + val("dr") + " 天）");
+  if (r.tier) {
+    setOut("o_reco", r.tier.label + (r.bumped ? "（存储量大，I/O 余量上调一档）" : "") +
+      "，磁盘 ≥ " + Math.ceil(r.diskGb / 50) * 50 + " GB");
+    setOut("o_price", r.tier.price);
+  } else {
+    setOut("o_reco", "超出单机推荐表，建议集群部署或专项评估");
+    setOut("o_price", "-");
+  }
+  setOut("o_bw", "≥ " + (r.bwMbps >= 1 ? Math.ceil(r.bwMbps) + " Mbps" : "1 Mbps") +
+    "（W × " + cfg.bandwidth_safety + " 安全系数；家庭/校园宽带通常已覆盖小场景）");
+}
+
+function preset(n, m, t, qos, fmt, s, dr) {
+  document.getElementById("n").value = n;
+  document.getElementById("m").value = m;
+  document.getElementById("t").value = t;
+  document.getElementById("qos").value = String(qos);
+  document.getElementById("fmt").value = fmt;
+  document.getElementById("s").value = s;
+  document.getElementById("dr").value = dr;
+  document.getElementById("ver").value = "5";
+  document.getElementById("alias").value = "on";
+  render();
+}
+
+document.querySelectorAll("input, select").forEach((el) => el.addEventListener("input", render));
+
+fetch("/api/calc_config").then((r) => r.json()).then((data) => { cfg = data; render(); });
+</script>
+</body>
+</html>

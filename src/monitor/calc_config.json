@@ -1,0 +1,19 @@
+{
+  "calibrated_at": "2026-06-11",
+  "source": "docs/project_outputs/测试证据/性能实验数据表.md",
+  "b_pub": {
+    "qos1": {"json": 261.9, "json-min": 203.0, "msgpack": 185.9},
+    "qos0_delta": -59.4,
+    "qos2_delta": 106.4,
+    "alias_off_delta": 21.3
+  },
+  "b_deliver": {"json": 283.0, "json-min": 224.0, "msgpack": 207.0},
+  "keepalive_bytes": 116,
+  "keepalive_interval_s": 60,
+  "mem_per_conn_kb": 15.3,
+  "mem_base_mb": 283,
+  "msgs_per_core": 19000,
+  "record_bytes": 100,
+  "safety_factor": 1.5,
+  "bandwidth_safety": 1.25
+}
