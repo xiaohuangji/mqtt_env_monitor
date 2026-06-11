@@ -3,6 +3,10 @@
 The backend subscribes to ``env_monitor/+/+`` with paho-mqtt, keeps the latest
 entry per (node_id, data_type), logs every received message with its receive
 time, and pushes updates to browsers through Server-Sent Events (SSE).
+
+Payloads may be json, json-min or msgpack (see
+docs/project_outputs/课程设计报告/网络负载与成本建模.md for the field mapping);
+``--mqtt-version`` selects MQTT 5.0 (default) or 3.1.1.
 """
 
 from __future__ import annotations
@@ -30,6 +34,25 @@ DATA_TYPE_CN = {
     "pm25": "PM2.5",
 }
 
+# Default units when compact payloads omit the unit field.
+UNIT_BY_TYPE = {
+    "temperature": "C",
+    "humidity": "%RH",
+    "light": "lux",
+    "noise": "dB",
+    "pressure": "hPa",
+    "co2": "ppm",
+    "pm25": "ug/m3",
+}
+
+# json-min / msgpack short keys -> full field names.
+SHORT_KEYS = {"n": "node_id", "d": "data_type", "v": "value", "u": "unit", "t": "timestamp", "s": "seq"}
+
+try:
+    import msgpack
+except ImportError:  # binary payloads are then counted as invalid
+    msgpack = None
+
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Run the web monitor for env_monitor topics.")
@@ -43,6 +66,8 @@ def parse_args() -> argparse.Namespace:
                         help="Mark an entry stale after this many seconds without data.")
     parser.add_argument("--log-file", default="", help="Optional file to append receive logs.")
     parser.add_argument("--client-id", default="web_monitor", help="MQTT client id.")
+    parser.add_argument("--mqtt-version", default="5", choices=("5", "311"),
+                        help="MQTT protocol version.")
     return parser.parse_args()
 
 
@@ -56,6 +81,39 @@ def is_failure(reason_code: object) -> bool:
     return reason_code != 0
 
 
+def decode_payload(raw: bytes) -> tuple[dict, str]:
+    """Decode json / json-min / msgpack payload bytes; raises ValueError."""
+    if raw[:1] == b"{":
+        try:
+            payload = json.loads(raw.decode("utf-8"))
+        except (UnicodeDecodeError, json.JSONDecodeError) as exc:
+            raise ValueError(f"bad json: {exc}") from exc
+        if not isinstance(payload, dict):
+            raise ValueError("payload is not an object")
+        return payload, ("json" if "node_id" in payload else "json-min")
+    if msgpack is None:
+        raise ValueError("binary payload but msgpack package not installed")
+    try:
+        payload = msgpack.unpackb(raw)
+    except Exception as exc:  # msgpack raises several exception types
+        raise ValueError(f"bad msgpack: {exc}") from exc
+    if not isinstance(payload, dict):
+        raise ValueError("payload is not an object")
+    return payload, "msgpack"
+
+
+def normalize_payload(payload: dict) -> dict:
+    """Expand short keys and epoch-ms timestamps from compact formats."""
+    out = {SHORT_KEYS.get(key, key): value for key, value in payload.items()}
+    ts = out.get("timestamp")
+    if isinstance(ts, (int, float)):
+        seconds = ts / 1000 if ts > 1e11 else ts
+        out["timestamp"] = datetime.fromtimestamp(seconds, CN_TZ).isoformat(timespec="milliseconds")
+    if not out.get("unit"):
+        out["unit"] = UNIT_BY_TYPE.get(str(out.get("data_type", "")), "")
+    return out
+
+
 class MonitorState:
     """Latest entries plus SSE subscriber queues, shared across threads."""
 
@@ -66,6 +124,7 @@ class MonitorState:
         self.subscribers: list[queue.Queue] = []
         self.received_total = 0
         self.invalid_total = 0
+        self.format_counts: dict[str, int] = {}
         self.log_handle = open(args.log_file, "a", encoding="utf-8") if args.log_file else None
 
     def log(self, line: str) -> None:
@@ -87,6 +146,7 @@ class MonitorState:
                 "topic": self.args.topic,
                 "received_total": self.received_total,
                 "invalid_total": self.invalid_total,
+                "format_counts": dict(self.format_counts),
                 "type_names": DATA_TYPE_CN,
                 "entries": entries,
             }
@@ -104,21 +164,23 @@ class MonitorState:
 
     def handle_message(self, message: mqtt.MQTTMessage) -> None:
         received = now_dt()
-        payload_text = message.payload.decode("utf-8", errors="replace")
-        self.log(
-            f"[recv {received.isoformat(timespec='milliseconds')}] "
-            f"topic={message.topic} qos={message.qos} payload={payload_text}"
-        )
-
         try:
-            payload = json.loads(payload_text)
-            if not isinstance(payload, dict):
-                raise ValueError("payload is not a JSON object")
-        except (json.JSONDecodeError, ValueError) as exc:
+            payload, fmt = decode_payload(message.payload)
+        except ValueError as exc:
             with self.lock:
                 self.invalid_total += 1
-            self.log(f"[warn] invalid payload ignored ({exc}): topic={message.topic}")
+            self.log(
+                f"[warn] invalid payload ignored ({exc}): "
+                f"topic={message.topic} raw={message.payload[:80]!r}"
+            )
             return
+
+        payload = normalize_payload(payload)
+        payload_text = json.dumps(payload, ensure_ascii=False, separators=(",", ":"))
+        self.log(
+            f"[recv {received.isoformat(timespec='milliseconds')}] "
+            f"topic={message.topic} qos={message.qos} format={fmt} payload={payload_text}"
+        )
 
         # Fall back to topic levels when fields are missing, so malformed
         # but routable messages still show up for debugging.
@@ -135,6 +197,7 @@ class MonitorState:
             "seq": payload.get("seq"),
             "topic": message.topic,
             "qos": message.qos,
+            "format": fmt,
             "received_at": received.isoformat(timespec="milliseconds"),
             "received_epoch": received.timestamp(),
         }
@@ -142,6 +205,7 @@ class MonitorState:
         with self.lock:
             self.latest[(node_id, data_type)] = entry
             self.received_total += 1
+            self.format_counts[fmt] = self.format_counts.get(fmt, 0) + 1
             update = {"entry": entry, "received_total": self.received_total}
             for q in self.subscribers:
                 q.put(update)
@@ -152,7 +216,7 @@ def build_mqtt_client(state: MonitorState) -> mqtt.Client:
     client = mqtt.Client(
         mqtt.CallbackAPIVersion.VERSION2,
         client_id=args.client_id,
-        protocol=mqtt.MQTTv311,
+        protocol=mqtt.MQTTv5 if args.mqtt_version == "5" else mqtt.MQTTv311,
     )
 
     def on_connect(client: mqtt.Client, userdata: object, flags: object, reason_code: object, properties: object) -> None:
