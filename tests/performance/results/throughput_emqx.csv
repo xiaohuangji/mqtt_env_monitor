@@ -1,0 +1,6 @@
+broker,offered_rate,pub_conns,qos,payload_bytes,rss_mb_avg,cpu_pct_avg,cpu_pct_peak,status
+emqx,1000,100,1,118,627.9,8.5,9.9,ok
+emqx,5000,500,1,118,583.6,50.8,60.1,ok
+emqx,10000,1000,1,118,559.7,101.1,110.9,ok
+emqx,20000,2000,1,118,543.4,212.1,244.2,ok
+emqx,50000,5000,1,118,610.8,318.3,330.2,ok

@@ -1,0 +1,53 @@
+Start with 1 workers, addrs pool size: 1 and req interval: 10 ms 
+
+1s sub total=1 rate=1.00/sec
+1s connect_succ total=1 rate=1.00/sec
+4s recv total=4457 rate=1113.69/sec
+5s recv total=17516 rate=13059.00/sec
+6s recv total=39390 rate=21874.00/sec
+7s recv total=69205 rate=29815.00/sec
+8s recv total=97479 rate=28274.00/sec
+9s recv total=119262 rate=21783.00/sec
+10s recv total=144489 rate=25227.00/sec
+11s recv total=168839 rate=24350.00/sec
+12s recv total=194718 rate=25879.00/sec
+13s recv total=219539 rate=24821.00/sec
+14s recv total=245892 rate=26353.00/sec
+15s recv total=270763 rate=24871.00/sec
+16s recv total=294203 rate=23440.00/sec
+17s recv total=319395 rate=25192.00/sec
+18s recv total=343898 rate=24503.00/sec
+19s recv total=367833 rate=23935.00/sec
+20s recv total=392063 rate=24230.00/sec
+21s recv total=416558 rate=24495.00/sec
+22s recv total=440983 rate=24425.00/sec
+23s recv total=465029 rate=24046.00/sec
+24s recv total=489579 rate=24550.00/sec
+25s recv total=513324 rate=23745.00/sec
+26s recv total=538145 rate=24821.00/sec
+27s recv total=561101 rate=22956.00/sec
+28s recv total=585483 rate=24382.00/sec
+29s recv total=609637 rate=24154.00/sec
+30s recv total=635073 rate=25436.00/sec
+31s recv total=659597 rate=24524.00/sec
+32s recv total=685617 rate=26020.00/sec
+33s recv total=710201 rate=24584.00/sec
+34s recv total=735170 rate=24969.00/sec
+35s recv total=759148 rate=23978.00/sec
+36s recv total=782263 rate=23115.00/sec
+37s recv total=804365 rate=22102.00/sec
+38s recv total=827169 rate=22804.00/sec
+39s recv total=851597 rate=24428.00/sec
+40s recv total=875623 rate=24026.00/sec
+41s recv total=899885 rate=24262.00/sec
+42s recv total=924456 rate=24571.00/sec
+43s recv total=949427 rate=24971.00/sec
+44s recv total=975283 rate=25856.00/sec
+45s recv total=999750 rate=24467.00/sec
+46s recv total=1023892 rate=24142.00/sec
+47s recv total=1048840 rate=24948.00/sec
+48s recv total=1072572 rate=23732.00/sec
+49s recv total=1096498 rate=23926.00/sec
+=INFO REPORT==== 11-Jun-2026::18:28:19.333411 ===
+SIGTERM received - shutting down
+

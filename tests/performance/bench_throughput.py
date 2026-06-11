@@ -40,6 +40,11 @@ def parse_args() -> argparse.Namespace:
                         help="Payload bytes (defaults to the json profile size).")
     parser.add_argument("--qos", type=int, default=1, choices=(0, 1, 2))
     parser.add_argument("--hold", type=float, default=30.0)
+    parser.add_argument("--conn-interval-ms", type=int, default=1,
+                        help="Interval between publisher connects (raise for slow brokers).")
+    parser.add_argument("--proto-version", type=int, default=5, choices=(3, 4, 5),
+                        help="MQTT protocol version for bench clients "
+                             "(4 = 3.1.1, required for amqtt).")
     parser.add_argument("--output", default="throughput_results.csv")
     return parser.parse_args()
 
@@ -65,10 +70,11 @@ def main() -> None:
             conns = max(1, rate // args.msg_per_conn)
             interval_ms = max(1, int(1000 / args.msg_per_conn))
             sub_cmd = (f"{args.bench} sub -h {args.host} -p {args.port} "
-                       f"-c 1 -t 'bench/#' -q {args.qos}")
+                       f"-c 1 -t 'bench/#' -q {args.qos} -V {args.proto_version}")
             pub_cmd = (f"{args.bench} pub -h {args.host} -p {args.port} "
                        f"-c {conns} -I {interval_ms} -t 'bench/%i' "
-                       f"-s {args.payload_size} -q {args.qos} -i 1")
+                       f"-s {args.payload_size} -q {args.qos} -i {args.conn_interval_ms} "
+                       f"-V {args.proto_version}")
             print(f"[rate {rate}] conns={conns} interval={interval_ms}ms")
 
             sub_log = output.with_suffix(f".sub_{rate}.log")

@@ -1,0 +1,6 @@
+broker,target_conns,reached_conns,rss_mb_avg,rss_mb_peak,cpu_pct_avg,cpu_pct_peak,status
+emqx,1000,1000,298.5,301.7,0.6,6.2,ok
+emqx,5000,5000,408.0,419.0,1.8,16.5,ok
+emqx,10000,10000,532.6,558.9,2.9,23.4,ok
+emqx,20000,20000,672.1,719.2,4.9,25.0,ok
+emqx,50000,50000,1048.9,1062.7,8.4,31.9,ok
