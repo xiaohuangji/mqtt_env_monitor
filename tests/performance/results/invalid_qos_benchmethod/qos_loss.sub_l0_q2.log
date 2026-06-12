@@ -1,0 +1,38 @@
+Start with 1 workers, addrs pool size: 1 and req interval: 10 ms 
+
+1s sub total=1 rate=1.00/sec
+1s connect_succ total=1 rate=1.00/sec
+3s recv total=16 rate=5.33/sec
+4s recv total=1864 rate=1848.00/sec
+5s recv total=3864 rate=2000.00/sec
+6s recv total=5864 rate=2000.00/sec
+7s recv total=7864 rate=2000.00/sec
+8s recv total=9864 rate=2000.00/sec
+9s recv total=11864 rate=2000.00/sec
+10s recv total=13864 rate=2000.00/sec
+11s recv total=15864 rate=2000.00/sec
+12s recv total=17864 rate=2000.00/sec
+13s recv total=19864 rate=2000.00/sec
+14s recv total=21864 rate=2000.00/sec
+15s recv total=23864 rate=2000.00/sec
+16s recv total=25864 rate=2000.00/sec
+17s recv total=27864 rate=2000.00/sec
+18s recv total=29864 rate=2000.00/sec
+19s recv total=31864 rate=2000.00/sec
+20s recv total=33864 rate=2000.00/sec
+21s recv total=35864 rate=2000.00/sec
+22s recv total=37864 rate=2000.00/sec
+23s recv total=39864 rate=2000.00/sec
+24s recv total=41864 rate=2000.00/sec
+25s recv total=43864 rate=2000.00/sec
+26s recv total=45864 rate=2000.00/sec
+27s recv total=47864 rate=2000.00/sec
+28s recv total=49864 rate=2000.00/sec
+29s recv total=51864 rate=2000.00/sec
+30s recv total=53864 rate=2000.00/sec
+31s recv total=55864 rate=2000.00/sec
+32s recv total=57864 rate=2000.00/sec
+33s recv total=59864 rate=2000.00/sec
+=INFO REPORT==== 12-Jun-2026::11:54:48.238690 ===
+SIGTERM received - shutting down
+

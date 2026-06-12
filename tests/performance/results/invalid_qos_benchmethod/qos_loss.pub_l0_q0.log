@@ -1,0 +1,35 @@
+Start with 8 workers, addrs pool size: 1 and req interval: 8 ms 
+
+1s pub total=3664 rate=3656.69/sec
+1s connect_succ total=200 rate=199.60/sec
+2s pub total=7664 rate=4000.00/sec
+3s pub total=11664 rate=4000.00/sec
+4s pub total=15664 rate=4000.00/sec
+5s pub total=19664 rate=4000.00/sec
+6s pub total=23664 rate=4000.00/sec
+7s pub total=27664 rate=4000.00/sec
+8s pub total=31664 rate=4000.00/sec
+9s pub total=35664 rate=4000.00/sec
+10s pub total=39664 rate=4000.00/sec
+11s pub total=43664 rate=4000.00/sec
+12s pub total=47664 rate=4000.00/sec
+13s pub total=51664 rate=4000.00/sec
+14s pub total=55664 rate=4000.00/sec
+15s pub total=59664 rate=4000.00/sec
+16s pub total=63664 rate=4000.00/sec
+17s pub total=67664 rate=4000.00/sec
+18s pub total=71664 rate=4000.00/sec
+19s pub total=75664 rate=4000.00/sec
+20s pub total=79664 rate=4000.00/sec
+21s pub total=83664 rate=4000.00/sec
+22s pub total=87664 rate=4000.00/sec
+23s pub total=91664 rate=4000.00/sec
+24s pub total=95664 rate=4000.00/sec
+25s pub total=99664 rate=4000.00/sec
+26s pub total=103664 rate=4000.00/sec
+27s pub total=107664 rate=4000.00/sec
+28s pub total=111664 rate=4000.00/sec
+29s pub total=115664 rate=4000.00/sec
+=INFO REPORT==== 12-Jun-2026::11:53:32.344800 ===
+SIGTERM received - shutting down
+
