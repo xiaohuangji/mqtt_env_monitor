@@ -1,0 +1,344 @@
+Start with 8 workers, addrs pool size: 1 and req interval: 80 ms 
+
+1s sub total=10 rate=9.98/sec
+1s connect_succ total=10 rate=9.98/sec
+4s recv total=8150 rate=2036.48/sec
+5s recv total=16870 rate=8720.00/sec
+6s recv total=25470 rate=8600.00/sec
+7s recv total=34400 rate=8930.00/sec
+8s recv total=43120 rate=8720.00/sec
+9s recv total=52000 rate=8880.00/sec
+10s recv total=60880 rate=8880.00/sec
+11s recv total=69760 rate=8880.00/sec
+12s recv total=78640 rate=8880.00/sec
+13s recv total=87440 rate=8800.00/sec
+14s recv total=96320 rate=8880.00/sec
+15s recv total=105200 rate=8880.00/sec
+16s recv total=114080 rate=8880.00/sec
+17s recv total=122960 rate=8880.00/sec
+18s recv total=131840 rate=8880.00/sec
+19s recv total=148870 rate=17030.00/sec
+20s recv total=166491 rate=17621.00/sec
+21s recv total=183980 rate=17489.00/sec
+22s recv total=201600 rate=17620.00/sec
+23s recv total=219250 rate=17650.00/sec
+24s recv total=237020 rate=17770.00/sec
+25s recv total=254800 rate=17780.00/sec
+26s recv total=272560 rate=17760.00/sec
+27s recv total=290310 rate=17750.00/sec
+28s recv total=307990 rate=17680.00/sec
+29s recv total=325750 rate=17760.00/sec
+30s recv total=343520 rate=17770.00/sec
+31s recv total=361300 rate=17780.00/sec
+32s recv total=379070 rate=17770.00/sec
+33s recv total=396840 rate=17770.00/sec
+34s recv total=422723 rate=25883.00/sec
+35s recv total=449190 rate=26467.00/sec
+36s recv total=475701 rate=26484.52/sec
+37s recv total=501590 rate=25914.91/sec
+38s recv total=519200 rate=17610.00/sec
+39s recv total=537000 rate=17800.00/sec
+40s recv total=554780 rate=17780.00/sec
+41s recv total=572560 rate=17780.00/sec
+42s recv total=590310 rate=17750.00/sec
+43s recv total=607990 rate=17680.00/sec
+44s recv total=625750 rate=17760.00/sec
+45s recv total=643510 rate=17760.00/sec
+46s recv total=661280 rate=17770.00/sec
+47s recv total=679060 rate=17780.00/sec
+48s recv total=696820 rate=17760.00/sec
+49s recv total=722760 rate=25940.00/sec
+50s recv total=749170 rate=26410.00/sec
+51s recv total=775620 rate=26450.00/sec
+52s recv total=801590 rate=25970.00/sec
+53s recv total=819200 rate=17610.00/sec
+54s recv total=837000 rate=17800.00/sec
+55s recv total=854780 rate=17780.00/sec
+56s recv total=872560 rate=17780.00/sec
+57s recv total=890310 rate=17750.00/sec
+58s recv total=907990 rate=17680.00/sec
+59s recv total=925750 rate=17760.00/sec
+1m0s recv total=943510 rate=17760.00/sec
+1m1s recv total=961280 rate=17770.00/sec
+1m2s recv total=979060 rate=17780.00/sec
+1m3s recv total=996820 rate=17760.00/sec
+1m4s recv total=1022760 rate=25940.00/sec
+1m5s recv total=1049170 rate=26410.00/sec
+1m6s recv total=1075620 rate=26450.00/sec
+1m7s recv total=1101590 rate=25970.00/sec
+1m8s recv total=1119200 rate=17610.00/sec
+1m9s recv total=1137000 rate=17800.00/sec
+1m10s recv total=1154780 rate=17780.00/sec
+1m11s recv total=1172560 rate=17780.00/sec
+1m12s recv total=1190310 rate=17750.00/sec
+1m13s recv total=1207990 rate=17680.00/sec
+1m14s recv total=1225750 rate=17760.00/sec
+1m15s recv total=1243510 rate=17760.00/sec
+1m16s recv total=1261280 rate=17770.00/sec
+1m17s recv total=1279060 rate=17780.00/sec
+1m18s recv total=1296820 rate=17760.00/sec
+1m19s recv total=1322760 rate=25940.00/sec
+1m20s recv total=1349170 rate=26410.00/sec
+1m21s recv total=1375620 rate=26450.00/sec
+1m22s recv total=1401590 rate=25970.00/sec
+1m23s recv total=1419200 rate=17610.00/sec
+1m24s recv total=1437000 rate=17800.00/sec
+1m25s recv total=1454780 rate=17780.00/sec
+1m26s recv total=1472560 rate=17780.00/sec
+1m27s recv total=1490310 rate=17750.00/sec
+1m28s recv total=1507990 rate=17680.00/sec
+1m29s recv total=1525750 rate=17760.00/sec
+1m30s recv total=1543510 rate=17760.00/sec
+1m31s recv total=1561280 rate=17770.00/sec
+1m32s recv total=1579060 rate=17780.00/sec
+1m33s recv total=1596820 rate=17760.00/sec
+1m34s recv total=1622760 rate=25940.00/sec
+1m35s recv total=1649170 rate=26410.00/sec
+1m36s recv total=1675620 rate=26450.00/sec
+1m37s recv total=1701590 rate=25970.00/sec
+1m38s recv total=1719200 rate=17610.00/sec
+1m39s recv total=1737000 rate=17800.00/sec
+1m40s recv total=1754780 rate=17780.00/sec
+1m41s recv total=1772560 rate=17780.00/sec
+1m42s recv total=1790310 rate=17750.00/sec
+1m43s recv total=1807990 rate=17680.00/sec
+1m44s recv total=1825750 rate=17760.00/sec
+1m45s recv total=1843510 rate=17760.00/sec
+1m46s recv total=1861280 rate=17770.00/sec
+1m47s recv total=1879060 rate=17780.00/sec
+1m48s recv total=1896820 rate=17760.00/sec
+1m49s recv total=1922760 rate=25940.00/sec
+1m50s recv total=1949170 rate=26410.00/sec
+1m51s recv total=1975622 rate=26452.00/sec
+1m52s recv total=2001590 rate=25968.00/sec
+1m53s recv total=2019200 rate=17610.00/sec
+1m54s recv total=2037000 rate=17800.00/sec
+1m55s recv total=2054780 rate=17780.00/sec
+1m56s recv total=2072560 rate=17780.00/sec
+1m57s recv total=2090310 rate=17750.00/sec
+1m58s recv total=2107990 rate=17680.00/sec
+1m59s recv total=2125750 rate=17760.00/sec
+2m0s recv total=2143510 rate=17760.00/sec
+2m1s recv total=2161280 rate=17770.00/sec
+2m2s recv total=2179060 rate=17780.00/sec
+2m3s recv total=2196820 rate=17760.00/sec
+2m4s recv total=2222760 rate=25940.00/sec
+2m5s recv total=2249170 rate=26410.00/sec
+2m6s recv total=2275620 rate=26450.00/sec
+2m7s recv total=2301590 rate=25970.00/sec
+2m8s recv total=2319200 rate=17610.00/sec
+2m9s recv total=2337000 rate=17800.00/sec
+2m10s recv total=2354780 rate=17780.00/sec
+2m11s recv total=2372560 rate=17780.00/sec
+2m12s recv total=2390310 rate=17750.00/sec
+2m13s recv total=2407990 rate=17680.00/sec
+2m14s recv total=2425750 rate=17760.00/sec
+2m15s recv total=2443510 rate=17760.00/sec
+2m16s recv total=2461280 rate=17770.00/sec
+2m17s recv total=2479060 rate=17780.00/sec
+2m18s recv total=2496820 rate=17760.00/sec
+2m19s recv total=2522760 rate=25940.00/sec
+2m20s recv total=2549170 rate=26410.00/sec
+2m21s recv total=2575620 rate=26450.00/sec
+2m22s recv total=2601590 rate=25970.00/sec
+2m23s recv total=2619200 rate=17610.00/sec
+2m24s recv total=2637000 rate=17800.00/sec
+2m25s recv total=2654780 rate=17780.00/sec
+2m26s recv total=2672560 rate=17780.00/sec
+2m27s recv total=2690310 rate=17750.00/sec
+2m28s recv total=2707990 rate=17680.00/sec
+2m29s recv total=2725750 rate=17760.00/sec
+2m30s recv total=2743510 rate=17760.00/sec
+2m31s recv total=2761280 rate=17770.00/sec
+2m32s recv total=2779060 rate=17780.00/sec
+2m33s recv total=2796820 rate=17760.00/sec
+2m34s recv total=2822760 rate=25940.00/sec
+2m35s recv total=2849170 rate=26410.00/sec
+2m36s recv total=2875620 rate=26450.00/sec
+2m37s recv total=2901590 rate=25970.00/sec
+2m38s recv total=2919200 rate=17610.00/sec
+2m39s recv total=2937000 rate=17800.00/sec
+2m40s recv total=2954780 rate=17780.00/sec
+2m41s recv total=2972560 rate=17780.00/sec
+2m42s recv total=2990310 rate=17750.00/sec
+2m43s recv total=3007990 rate=17680.00/sec
+2m44s recv total=3025750 rate=17760.00/sec
+2m45s recv total=3043510 rate=17760.00/sec
+2m46s recv total=3061280 rate=17770.00/sec
+2m47s recv total=3079060 rate=17780.00/sec
+2m48s recv total=3096820 rate=17760.00/sec
+2m49s recv total=3122760 rate=25940.00/sec
+2m50s recv total=3149170 rate=26410.00/sec
+2m51s recv total=3175620 rate=26450.00/sec
+2m52s recv total=3201620 rate=26000.00/sec
+2m53s recv total=3219200 rate=17580.00/sec
+2m54s recv total=3237000 rate=17800.00/sec
+2m55s recv total=3254780 rate=17780.00/sec
+2m56s recv total=3272560 rate=17780.00/sec
+2m57s recv total=3290310 rate=17750.00/sec
+2m58s recv total=3307990 rate=17680.00/sec
+2m59s recv total=3325750 rate=17760.00/sec
+3m0s recv total=3343510 rate=17760.00/sec
+3m1s recv total=3361280 rate=17770.00/sec
+3m2s recv total=3379060 rate=17780.00/sec
+3m3s recv total=3396820 rate=17760.00/sec
+3m4s recv total=3422760 rate=25940.00/sec
+3m5s recv total=3449170 rate=26410.00/sec
+3m6s recv total=3475620 rate=26450.00/sec
+3m7s recv total=3501590 rate=25970.00/sec
+3m8s recv total=3519200 rate=17610.00/sec
+3m9s recv total=3537000 rate=17800.00/sec
+3m10s recv total=3554780 rate=17780.00/sec
+3m11s recv total=3572560 rate=17780.00/sec
+3m12s recv total=3590310 rate=17750.00/sec
+3m13s recv total=3607990 rate=17680.00/sec
+3m14s recv total=3625750 rate=17760.00/sec
+3m15s recv total=3643510 rate=17760.00/sec
+3m16s recv total=3661280 rate=17770.00/sec
+3m17s recv total=3679060 rate=17780.00/sec
+3m18s recv total=3696820 rate=17760.00/sec
+3m19s recv total=3722760 rate=25940.00/sec
+3m20s recv total=3749170 rate=26410.00/sec
+3m21s recv total=3775620 rate=26450.00/sec
+3m22s recv total=3801586 rate=25966.00/sec
+3m23s recv total=3819200 rate=17614.00/sec
+3m24s recv total=3837000 rate=17800.00/sec
+3m25s recv total=3854780 rate=17780.00/sec
+3m26s recv total=3872560 rate=17780.00/sec
+3m27s recv total=3890310 rate=17750.00/sec
+3m28s recv total=3907990 rate=17680.00/sec
+3m29s recv total=3925750 rate=17760.00/sec
+3m30s recv total=3943510 rate=17760.00/sec
+3m31s recv total=3961280 rate=17770.00/sec
+3m32s recv total=3979060 rate=17780.00/sec
+3m33s recv total=3996820 rate=17760.00/sec
+3m34s recv total=4022760 rate=25940.00/sec
+3m35s recv total=4049170 rate=26410.00/sec
+3m36s recv total=4075620 rate=26450.00/sec
+3m37s recv total=4101590 rate=25970.00/sec
+3m38s recv total=4119200 rate=17610.00/sec
+3m39s recv total=4137000 rate=17800.00/sec
+3m40s recv total=4154780 rate=17780.00/sec
+3m41s recv total=4172560 rate=17780.00/sec
+3m42s recv total=4190310 rate=17750.00/sec
+3m43s recv total=4207990 rate=17680.00/sec
+3m44s recv total=4225750 rate=17760.00/sec
+3m45s recv total=4243510 rate=17760.00/sec
+3m46s recv total=4261280 rate=17770.00/sec
+3m47s recv total=4279060 rate=17780.00/sec
+3m48s recv total=4296820 rate=17760.00/sec
+3m49s recv total=4322760 rate=25940.00/sec
+3m50s recv total=4349170 rate=26410.00/sec
+3m51s recv total=4375620 rate=26450.00/sec
+3m52s recv total=4401618 rate=25998.00/sec
+3m53s recv total=4419200 rate=17582.00/sec
+3m54s recv total=4437000 rate=17800.00/sec
+3m55s recv total=4454780 rate=17780.00/sec
+3m56s recv total=4472560 rate=17780.00/sec
+3m57s recv total=4490310 rate=17750.00/sec
+3m58s recv total=4507990 rate=17680.00/sec
+3m59s recv total=4525750 rate=17760.00/sec
+4m0s recv total=4543510 rate=17760.00/sec
+4m1s recv total=4561280 rate=17770.00/sec
+4m2s recv total=4579060 rate=17780.00/sec
+4m3s recv total=4596820 rate=17760.00/sec
+4m4s recv total=4622760 rate=25940.00/sec
+4m5s recv total=4649170 rate=26410.00/sec
+4m6s recv total=4675620 rate=26450.00/sec
+4m7s recv total=4701590 rate=25970.00/sec
+4m8s recv total=4719200 rate=17610.00/sec
+4m9s recv total=4737000 rate=17800.00/sec
+4m10s recv total=4754780 rate=17780.00/sec
+4m11s recv total=4772560 rate=17780.00/sec
+4m12s recv total=4790310 rate=17750.00/sec
+4m13s recv total=4807990 rate=17680.00/sec
+4m14s recv total=4825750 rate=17760.00/sec
+4m15s recv total=4843510 rate=17760.00/sec
+4m16s recv total=4861280 rate=17770.00/sec
+4m17s recv total=4879060 rate=17780.00/sec
+4m18s recv total=4896820 rate=17760.00/sec
+4m19s recv total=4922760 rate=25940.00/sec
+4m20s recv total=4949170 rate=26410.00/sec
+4m21s recv total=4975620 rate=26450.00/sec
+4m22s recv total=5001598 rate=25978.00/sec
+4m23s recv total=5019200 rate=17602.00/sec
+4m24s recv total=5037000 rate=17800.00/sec
+4m25s recv total=5054780 rate=17780.00/sec
+4m26s recv total=5072560 rate=17780.00/sec
+4m27s recv total=5090310 rate=17750.00/sec
+4m28s recv total=5107990 rate=17680.00/sec
+4m29s recv total=5125750 rate=17760.00/sec
+4m30s recv total=5143510 rate=17760.00/sec
+4m31s recv total=5161280 rate=17770.00/sec
+4m32s recv total=5179060 rate=17780.00/sec
+4m33s recv total=5196820 rate=17760.00/sec
+4m34s recv total=5222760 rate=25940.00/sec
+4m35s recv total=5249170 rate=26410.00/sec
+4m36s recv total=5275620 rate=26450.00/sec
+4m37s recv total=5301590 rate=25970.00/sec
+4m38s recv total=5319200 rate=17610.00/sec
+4m39s recv total=5337000 rate=17800.00/sec
+4m40s recv total=5354780 rate=17780.00/sec
+4m41s recv total=5372560 rate=17780.00/sec
+4m42s recv total=5390310 rate=17750.00/sec
+4m43s recv total=5407990 rate=17680.00/sec
+4m44s recv total=5425750 rate=17760.00/sec
+4m45s recv total=5443510 rate=17760.00/sec
+4m46s recv total=5461280 rate=17770.00/sec
+4m47s recv total=5479060 rate=17780.00/sec
+4m48s recv total=5496820 rate=17760.00/sec
+4m49s recv total=5522760 rate=25940.00/sec
+4m50s recv total=5549170 rate=26410.00/sec
+4m51s recv total=5575620 rate=26450.00/sec
+4m52s recv total=5601590 rate=25970.00/sec
+4m53s recv total=5619200 rate=17610.00/sec
+4m54s recv total=5636998 rate=17798.00/sec
+4m55s recv total=5654780 rate=17782.00/sec
+4m56s recv total=5672560 rate=17780.00/sec
+4m57s recv total=5690310 rate=17750.00/sec
+4m58s recv total=5707990 rate=17680.00/sec
+4m59s recv total=5725750 rate=17760.00/sec
+5m0s recv total=5743510 rate=17760.00/sec
+5m1s recv total=5761280 rate=17770.00/sec
+5m2s recv total=5779060 rate=17780.00/sec
+5m3s recv total=5796820 rate=17760.00/sec
+5m4s recv total=5822760 rate=25940.00/sec
+5m5s recv total=5849170 rate=26410.00/sec
+5m6s recv total=5875620 rate=26450.00/sec
+5m7s recv total=5901590 rate=25970.00/sec
+5m8s recv total=5919200 rate=17610.00/sec
+5m9s recv total=5937000 rate=17800.00/sec
+5m10s recv total=5954780 rate=17780.00/sec
+5m11s recv total=5972560 rate=17780.00/sec
+5m12s recv total=5990310 rate=17750.00/sec
+5m13s recv total=6007990 rate=17680.00/sec
+5m14s recv total=6025750 rate=17760.00/sec
+5m15s recv total=6043510 rate=17760.00/sec
+5m16s recv total=6061280 rate=17770.00/sec
+5m17s recv total=6079060 rate=17780.00/sec
+5m18s recv total=6096820 rate=17760.00/sec
+5m19s recv total=6122760 rate=25940.00/sec
+5m20s recv total=6149170 rate=26410.00/sec
+5m21s recv total=6175620 rate=26450.00/sec
+5m22s recv total=6201590 rate=25970.00/sec
+5m23s recv total=6219200 rate=17610.00/sec
+5m24s recv total=6237000 rate=17800.00/sec
+5m25s recv total=6254780 rate=17780.00/sec
+5m26s recv total=6272560 rate=17780.00/sec
+5m27s recv total=6290310 rate=17750.00/sec
+5m28s recv total=6307990 rate=17680.00/sec
+5m29s recv total=6325750 rate=17760.00/sec
+5m30s recv total=6343510 rate=17760.00/sec
+5m31s recv total=6361280 rate=17770.00/sec
+5m32s recv total=6379060 rate=17780.00/sec
+5m33s recv total=6396820 rate=17760.00/sec
+5m34s recv total=6422760 rate=25940.00/sec
+5m35s recv total=6449170 rate=26410.00/sec
+5m36s recv total=6475620 rate=26450.00/sec
+5m37s recv total=6501590 rate=25970.00/sec
+5m38s recv total=6519200 rate=17610.00/sec
+5m39s recv total=6537000 rate=17800.00/sec
+5m40s recv total=6544890 rate=7890.00/sec
+=INFO REPORT==== 12-Jun-2026::12:26:17.360714 ===
+SIGTERM received - shutting down
+

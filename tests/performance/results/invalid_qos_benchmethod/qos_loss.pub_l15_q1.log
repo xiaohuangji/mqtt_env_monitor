@@ -1,0 +1,101 @@
+Start with 8 workers, addrs pool size: 1 and req interval: 8 ms 
+
+1s pub total=862 rate=860.28/sec
+1s pub_overrun total=333 rate=332.34/sec
+1s pub_succ total=862 rate=860.28/sec
+1s connect_succ total=133 rate=132.73/sec
+2s pub total=2224 rate=1362.00/sec
+2s pub_overrun total=1085 rate=752.00/sec
+2s pub_succ total=2224 rate=1362.00/sec
+2s connect_succ total=176 rate=43.00/sec
+3s pub total=3628 rate=1404.00/sec
+3s pub_overrun total=2068 rate=983.00/sec
+3s pub_succ total=3628 rate=1404.00/sec
+3s connect_succ total=180 rate=4.00/sec
+4s pub total=5164 rate=1536.00/sec
+4s pub_overrun total=3175 rate=1107.00/sec
+4s pub_succ total=5164 rate=1536.00/sec
+4s connect_succ total=194 rate=14.00/sec
+5s pub total=6700 rate=1536.00/sec
+5s pub_overrun total=4332 rate=1157.00/sec
+5s pub_succ total=6700 rate=1536.00/sec
+5s connect_succ total=198 rate=4.00/sec
+6s pub total=8339 rate=1639.00/sec
+6s pub_overrun total=5666 rate=1334.00/sec
+6s pub_succ total=8339 rate=1639.00/sec
+7s pub total=10014 rate=1675.00/sec
+7s pub_overrun total=7071 rate=1405.00/sec
+7s pub_succ total=10014 rate=1675.00/sec
+7s connect_succ total=199 rate=0.50/sec
+8s pub total=11845 rate=1831.00/sec
+8s pub_overrun total=8586 rate=1515.00/sec
+8s pub_succ total=11845 rate=1831.00/sec
+9s pub total=13474 rate=1629.00/sec
+9s pub_overrun total=9922 rate=1336.00/sec
+9s pub_succ total=13474 rate=1629.00/sec
+client(165): connect error - {tcp_closed,#Port<0.244>}
+client(165): EXIT for {shutdown,tcp_closed}
+10s pub total=15252 rate=1778.00/sec
+10s pub_overrun total=11430 rate=1508.00/sec
+10s pub_succ total=15252 rate=1778.00/sec
+10s connect_fail total=1 rate=0.10/sec
+11s pub total=17061 rate=1809.00/sec
+11s pub_overrun total=12956 rate=1526.00/sec
+11s pub_succ total=17061 rate=1809.00/sec
+12s pub total=18824 rate=1763.00/sec
+12s pub_overrun total=14454 rate=1498.00/sec
+12s pub_succ total=18824 rate=1763.00/sec
+13s pub total=20635 rate=1811.00/sec
+13s pub_overrun total=16056 rate=1602.00/sec
+13s pub_succ total=20635 rate=1811.00/sec
+14s pub total=22391 rate=1756.00/sec
+14s pub_overrun total=17582 rate=1526.00/sec
+14s pub_succ total=22391 rate=1756.00/sec
+15s pub total=24252 rate=1861.00/sec
+15s pub_overrun total=19239 rate=1657.00/sec
+15s pub_succ total=24252 rate=1861.00/sec
+16s pub total=26085 rate=1833.00/sec
+16s pub_overrun total=20888 rate=1649.00/sec
+16s pub_succ total=26085 rate=1833.00/sec
+17s pub total=27992 rate=1907.00/sec
+17s pub_overrun total=22598 rate=1710.00/sec
+17s pub_succ total=27992 rate=1907.00/sec
+18s pub total=29862 rate=1870.00/sec
+18s pub_overrun total=24285 rate=1687.00/sec
+18s pub_succ total=29862 rate=1870.00/sec
+19s pub total=31862 rate=2000.00/sec
+19s pub_overrun total=26088 rate=1803.00/sec
+19s pub_succ total=31862 rate=2000.00/sec
+20s pub total=33961 rate=2099.00/sec
+20s pub_overrun total=27994 rate=1906.00/sec
+20s pub_succ total=33961 rate=2099.00/sec
+21s pub total=35777 rate=1816.00/sec
+21s pub_overrun total=29620 rate=1626.00/sec
+21s pub_succ total=35777 rate=1816.00/sec
+22s pub total=37778 rate=2001.00/sec
+22s pub_overrun total=31431 rate=1811.00/sec
+22s pub_succ total=37778 rate=2001.00/sec
+23s pub total=39597 rate=1819.00/sec
+23s pub_overrun total=33064 rate=1633.00/sec
+23s pub_succ total=39597 rate=1819.00/sec
+24s pub total=41492 rate=1895.00/sec
+24s pub_overrun total=34785 rate=1721.00/sec
+24s pub_succ total=41492 rate=1895.00/sec
+25s pub total=43470 rate=1978.00/sec
+25s pub_overrun total=36566 rate=1781.00/sec
+25s pub_succ total=43470 rate=1978.00/sec
+26s pub total=45411 rate=1941.00/sec
+26s pub_overrun total=38312 rate=1746.00/sec
+26s pub_succ total=45411 rate=1941.00/sec
+27s pub total=47325 rate=1914.00/sec
+27s pub_overrun total=40082 rate=1770.00/sec
+27s pub_succ total=47325 rate=1914.00/sec
+28s pub total=49210 rate=1885.00/sec
+28s pub_overrun total=41812 rate=1730.00/sec
+28s pub_succ total=49210 rate=1885.00/sec
+29s pub total=51221 rate=2011.00/sec
+29s pub_overrun total=43643 rate=1831.00/sec
+29s pub_succ total=51221 rate=2011.00/sec
+=INFO REPORT==== 12-Jun-2026::11:57:53.896796 ===
+SIGTERM received - shutting down
+

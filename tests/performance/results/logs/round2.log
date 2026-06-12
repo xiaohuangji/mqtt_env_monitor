@@ -1,0 +1,54 @@
+=== 1/3 idle ramp (dense, 10 steps) 11:43:59 ===
+[step 1000] /opt/emqtt-bench/bin/emqtt_bench conn -h 127.0.0.1 -p 1883 -c 1000 -i 1 -V 5
+[step 1000] reached=1000 status=ok rss_avg=302.6MB cpu_avg=0.6%
+[step 3000] /opt/emqtt-bench/bin/emqtt_bench conn -h 127.0.0.1 -p 1883 -c 3000 -i 1 -V 5
+[step 3000] reached=3000 status=ok rss_avg=355.7MB cpu_avg=1.0%
+[step 5000] /opt/emqtt-bench/bin/emqtt_bench conn -h 127.0.0.1 -p 1883 -c 5000 -i 1 -V 5
+[step 5000] reached=5000 status=ok rss_avg=407.1MB cpu_avg=2.0%
+[step 8000] /opt/emqtt-bench/bin/emqtt_bench conn -h 127.0.0.1 -p 1883 -c 8000 -i 1 -V 5
+[step 8000] reached=8000 status=ok rss_avg=484.8MB cpu_avg=2.2%
+[step 10000] /opt/emqtt-bench/bin/emqtt_bench conn -h 127.0.0.1 -p 1883 -c 10000 -i 1 -V 5
+[step 10000] reached=10000 status=ok rss_avg=526.5MB cpu_avg=2.8%
+[step 15000] /opt/emqtt-bench/bin/emqtt_bench conn -h 127.0.0.1 -p 1883 -c 15000 -i 1 -V 5
+[step 15000] reached=15000 status=ok rss_avg=616.4MB cpu_avg=4.0%
+[step 20000] /opt/emqtt-bench/bin/emqtt_bench conn -h 127.0.0.1 -p 1883 -c 20000 -i 1 -V 5
+[step 20000] reached=20000 status=ok rss_avg=661.1MB cpu_avg=5.1%
+[step 30000] /opt/emqtt-bench/bin/emqtt_bench conn -h 127.0.0.1 -p 1883 -c 30000 -i 1 -V 5
+[step 30000] reached=30000 status=ok rss_avg=790.8MB cpu_avg=6.5%
+[step 40000] /opt/emqtt-bench/bin/emqtt_bench conn -h 127.0.0.1 -p 1883 -c 40000 -i 1 -V 5
+[step 40000] reached=40000 status=ok rss_avg=1001.2MB cpu_avg=8.2%
+[step 50000] /opt/emqtt-bench/bin/emqtt_bench conn -h 127.0.0.1 -p 1883 -c 50000 -i 1 -V 5
+[step 50000] reached=50000 status=ok rss_avg=1053.9MB cpu_avg=10.0%
+[ramp] results written to results/ramp_emqx_dense.csv
+=== 2/3 QoS x loss (3 loss x 3 qos) 11:52:59 ===
+=== loss 0.0% applied on lo ===
+  qos0: pub=115664 recv=59856 arrival=51.75%
+  qos1: pub=57792 recv=59832 arrival=103.53%
+  qos2: pub=57828 recv=59864 arrival=103.52%
+=== loss 5.0% applied on lo ===
+  qos0: pub=114920 recv=59486 arrival=51.76%
+  qos1: pub=57515 recv=32748 arrival=56.94%
+  qos2: pub=57396 recv=15009 arrival=26.15%
+=== loss 15.0% applied on lo ===
+  qos0: pub=113444 recv=52095 arrival=45.92%
+  qos1: pub=51221 recv=5457 arrival=10.65%
+  qos2: pub=29346 recv=2733 arrival=9.31%
+[netem] cleared
+[qos_loss] results written to results/qos_loss.csv
+=== 3/3 loaded ramp (7 steps, 1msg/15s/conn, 10 subs) 11:58:35 ===
+[step 5000] subs=10 pub_interval=15000ms payload=68
+[step 5000] reached=5000 status=ok rss_avg=632.0 rss_peak=635.0 cpu_avg=21.8
+[step 10000] subs=10 pub_interval=15000ms payload=68
+[step 10000] reached=9999 status=ok rss_avg=832.8 rss_peak=832.9 cpu_avg=42.7
+[step 15000] subs=10 pub_interval=15000ms payload=68
+[step 15000] reached=15000 status=ok rss_avg=1038.2 rss_peak=1038.7 cpu_avg=63.9
+[step 20000] subs=10 pub_interval=15000ms payload=68
+[step 20000] reached=20000 status=ok rss_avg=1584.8 rss_peak=1594.0 cpu_avg=80.3
+[step 30000] subs=10 pub_interval=15000ms payload=68
+[step 30000] reached=30000 status=ok rss_avg=1647.0 rss_peak=1651.9 cpu_avg=133.6
+[step 40000] subs=10 pub_interval=15000ms payload=68
+[step 40000] reached=40000 status=ok rss_avg=1828.1 rss_peak=1852.5 cpu_avg=172.1
+[step 50000] subs=10 pub_interval=15000ms payload=68
+[step 50000] reached=50000 status=ok rss_avg=2479.3 rss_peak=2508.5 cpu_avg=212.6
+[loadramp] results written to results/loadramp_emqx.csv
+=== ROUND2 DONE 12:38:41 ===
