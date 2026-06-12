@@ -4,88 +4,184 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>MQTT 多节点环境监测 - 需求计算器</title>
+<script src="/static/echarts.min.js"></script>
 <style>
-  body { font-family: "Microsoft YaHei", "PingFang SC", sans-serif; margin: 24px; color: #222; background: #f7f8fa; }
-  h1 { font-size: 22px; margin: 0 0 12px; }
-  h2 { font-size: 16px; margin: 18px 0 8px; }
-  .panel { background: #fff; border: 1px solid #e3e6ea; border-radius: 6px; padding: 14px 16px; margin-bottom: 14px; font-size: 14px; }
-  .presets button { margin: 0 8px 8px 0; padding: 6px 12px; font-size: 13px; border: 1px solid #c8cdd4; border-radius: 4px; background: #f0f2f5; cursor: pointer; }
-  .presets button:hover { background: #e3e6ea; }
-  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 10px 18px; }
-  label { display: block; font-size: 13px; color: #555; margin-bottom: 3px; }
-  input, select { width: 100%; box-sizing: border-box; padding: 6px 8px; font-size: 14px; border: 1px solid #c8cdd4; border-radius: 4px; background: #fff; }
-  table { width: 100%; border-collapse: collapse; background: #fff; }
-  th, td { padding: 8px 12px; text-align: left; font-size: 14px; border-bottom: 1px solid #eef0f2; }
-  th { background: #f0f2f5; font-weight: 600; width: 220px; }
-  tr:last-child td, tr:last-child th { border-bottom: none; }
-  td b { color: #0b5fa5; }
-  .reco { font-size: 15px; }
-  .reco b { color: #1a7f37; font-size: 17px; }
-  .hint { font-size: 13px; color: #777; margin-top: 10px; line-height: 1.7; }
-  a { color: #0b5fa5; text-decoration: none; }
+  :root {
+    --bg: #0e141b; --card: #151d26; --card2: #1a2430; --line: #243140;
+    --txt: #e6edf3; --txt2: #8b98a9; --txt3: #5d6b7c;
+    --blue: #4aa8ff; --green: #00d68f; --purple: #b39cf7; --orange: #ffb020; --red: #ff6b6b; --cyan: #3fd2e0;
+  }
+  * { box-sizing: border-box; }
+  body { font-family: "Microsoft YaHei", "PingFang SC", sans-serif; margin: 0; background: var(--bg); color: var(--txt); }
+  .topbar { display: flex; align-items: center; gap: 10px; padding: 14px 26px; border-bottom: 1px solid var(--line);
+            background: linear-gradient(180deg, #121a23, #0e141b); position: sticky; top: 0; z-index: 10; }
+  .logo { width: 10px; height: 10px; border-radius: 3px; background: var(--green); box-shadow: 0 0 10px var(--green); }
+  .topbar h1 { font-size: 16px; margin: 0; font-weight: 600; }
+  .topbar .sub { font-size: 12px; color: var(--txt2); margin-left: 6px; }
+  .topbar a { margin-left: auto; color: var(--blue); text-decoration: none; font-size: 13px; }
+  .layout { display: grid; grid-template-columns: 330px 1fr; gap: 16px; max-width: 1480px; margin: 0 auto; padding: 18px 22px 50px; }
+  @media (max-width: 1000px) { .layout { grid-template-columns: 1fr; } .side { position: static !important; } }
+
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 16px 18px; }
+  .side { position: sticky; top: 70px; align-self: start; display: flex; flex-direction: column; gap: 14px; }
+  .side h3, .main h3 { font-size: 13px; color: var(--txt2); font-weight: 600; margin: 0 0 12px; letter-spacing: .06em; }
+
+  .field { margin-bottom: 12px; }
+  label { display: block; font-size: 12px; color: var(--txt2); margin-bottom: 5px; }
+  input, select { width: 100%; padding: 8px 10px; font-size: 14px; border: 1px solid var(--line); border-radius: 8px;
+                  background: var(--bg); color: var(--txt); }
+  input:focus, select:focus { outline: none; border-color: var(--blue); }
+  input[type="range"] { padding: 0; margin-top: 10px; accent-color: var(--green); }
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+  .main { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+  .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; }
+  .kpi { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; }
+  .kpi .t { font-size: 12px; color: var(--txt2); margin-bottom: 7px; }
+  .kpi .v { font-size: 26px; font-weight: 700; color: var(--c); line-height: 1.2; font-variant-numeric: tabular-nums; }
+  .kpi .d { font-size: 11.5px; color: var(--txt3); margin-top: 5px; }
+
+  .server { display: grid; grid-template-columns: 1fr auto; gap: 18px; align-items: center; }
+  .specs { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 12px; }
+  .spec { background: var(--card2); border: 1px solid var(--line); border-radius: 10px; padding: 11px 14px; }
+  .spec .t { font-size: 11.5px; color: var(--txt2); margin-bottom: 5px; }
+  .spec .v { font-size: 19px; font-weight: 700; color: var(--txt); font-variant-numeric: tabular-nums; }
+  .spec .sd { font-size: 10.5px; color: var(--txt3); margin-top: 4px; }
+  .reco-box { text-align: center; padding: 14px 26px; border: 1px solid rgba(0,214,143,.35); border-radius: 12px;
+              background: linear-gradient(160deg, rgba(0,214,143,.10), rgba(0,214,143,.02)); min-width: 240px; }
+  .reco-box .t { font-size: 12px; color: var(--txt2); }
+  .reco-box .v { font-size: 30px; font-weight: 800; color: var(--green); margin: 6px 0 4px; }
+  .reco-box .d { font-size: 12px; color: var(--txt2); }
+  .reco-box .p { font-size: 13px; color: var(--orange); margin-top: 6px; font-weight: 600; }
+
+  .chart { height: 330px; width: 100%; }
+  .chart-note { font-size: 12px; color: var(--txt3); line-height: 1.7; margin-top: 8px; }
+
+  details summary { cursor: pointer; font-size: 13.5px; font-weight: 600; color: var(--txt2); padding: 4px 0; }
+  table { width: 100%; border-collapse: collapse; margin-top: 8px; }
+  th, td { padding: 8px 10px; text-align: left; font-size: 13px; border-bottom: 1px solid var(--line); }
+  th { color: var(--txt2); font-weight: 500; width: 250px; }
+  td { color: var(--txt); }
+  tr:last-child th, tr:last-child td { border-bottom: none; }
+  .foot { font-size: 12px; color: var(--txt3); line-height: 1.8; }
 </style>
 </head>
 <body>
-<h1>需求计算器：输入需求参数 → 输出网络负载与服务器配置</h1>
-
-<div class="panel presets">
-  <b>场景预设：</b><br>
-  <button onclick="preset(20,4,30,1,'json',2,30)">① 教室/实验室</button>
-  <button onclick="preset(50,3,60,1,'json',2,30)">② 农业大棚</button>
-  <button onclick="preset(10,3,10,0,'json',3,7)">③ 智能家居</button>
-  <button onclick="preset(30,1,5,1,'json',2,30)">④ 噪声监测网格</button>
-  <button onclick="preset(100,4,30,1,'json',5,30)">⑤ 公共空间提示</button>
-  <button onclick="preset(20000,4,60,1,'json-min',10,30)">⑥ 校园全域（万级）</button>
+<div class="topbar">
+  <div class="logo"></div>
+  <h1>需求计算器</h1>
+  <span class="sub">输入需求参数 → 实时输出网络负载与服务器配置 · 系数由抓包与压测实验校准（2026-06-11）</span>
+  <a href="/">返回监控页 →</a>
 </div>
 
-<div class="panel">
-  <div class="grid">
-    <div><label>节点数 N</label><input id="n" type="number" min="1" value="20"></div>
-    <div><label>每节点测量量数 M（1–4）</label><input id="m" type="number" min="1" max="8" value="4"></div>
-    <div><label>上传周期 T（秒）</label><input id="t" type="number" min="0.1" step="0.1" value="30"></div>
-    <div><label>QoS 等级</label><select id="qos"><option value="0">0</option><option value="1" selected>1</option><option value="2">2</option></select></div>
-    <div><label>payload 格式</label><select id="fmt"><option value="json" selected>json</option><option value="json-min">json-min</option><option value="msgpack">msgpack</option></select></div>
-    <div><label>订阅端数量 S</label><input id="s" type="number" min="1" value="2"></div>
-    <div><label>协议版本</label><select id="ver"><option value="5" selected>MQTT 5.0</option><option value="311">MQTT 3.1.1</option></select></div>
-    <div><label>Topic Alias（仅 5.0）</label><select id="alias"><option value="on" selected>开启</option><option value="off">关闭</option></select></div>
-    <div><label>数据保留天数</label><input id="dr" type="number" min="0" value="30"></div>
+<div class="layout">
+  <!-- ========== 左侧：参数 ========== -->
+  <div class="side">
+    <div class="card">
+      <h3>需求参数</h3>
+      <div class="field"><label>节点数 N（可拖滑块）</label>
+        <input id="n" type="number" min="1" value="20">
+        <input id="nslider" type="range" min="0" max="100" value="30">
+      </div>
+      <div class="row2">
+        <div class="field"><label>测量量数 M</label><input id="m" type="number" min="1" max="8" value="4"></div>
+        <div class="field"><label>上传周期 T（秒）</label><input id="t" type="number" min="0.1" step="0.1" value="30"></div>
+      </div>
+      <div class="row2">
+        <div class="field"><label>QoS 等级</label>
+          <select id="qos"><option value="0">QoS 0</option><option value="1" selected>QoS 1</option><option value="2">QoS 2</option></select></div>
+        <div class="field"><label>payload 格式</label>
+          <select id="fmt"><option value="json" selected>json</option><option value="json-min">json-min</option><option value="msgpack">msgpack</option></select></div>
+      </div>
+      <div class="row2">
+        <div class="field"><label>订阅端数量 S</label><input id="s" type="number" min="1" value="2"></div>
+        <div class="field"><label>保留天数</label><input id="dr" type="number" min="0" value="30"></div>
+      </div>
+      <div class="row2">
+        <div class="field"><label>协议版本</label>
+          <select id="ver"><option value="5" selected>MQTT 5.0</option><option value="311">MQTT 3.1.1</option></select></div>
+        <div class="field"><label>Topic Alias</label>
+          <select id="alias"><option value="on" selected>开启</option><option value="off">关闭</option></select></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== 右侧：结果 ========== -->
+  <div class="main">
+    <div class="kpis">
+      <div class="kpi" style="--c:var(--blue)"><div class="t">服务器总带宽 W</div><div class="v" id="k_bw">-</div><div class="d" id="k_bw_d">-</div></div>
+      <div class="kpi" style="--c:var(--purple)"><div class="t">月流量（30 天）</div><div class="v" id="k_month">-</div><div class="d" id="k_month_d">-</div></div>
+      <div class="kpi" style="--c:var(--cyan)"><div class="t">消息率 R</div><div class="v" id="k_rate">-</div><div class="d">节点 × 测量量 ÷ 周期</div></div>
+      <div class="kpi" style="--c:var(--orange)"><div class="t">单条消息开销</div><div class="v" id="k_bmsg">-</div><div class="d">含 TCP/IP 头、QoS 交互与 ACK</div></div>
+    </div>
+
+    <div class="card">
+      <h3>服务器配置需求与推荐（含 1.5 安全系数）</h3>
+      <div class="server">
+        <div class="specs">
+          <div class="spec"><div class="t">内存需求（按满负载）</div><div class="v" id="s_ram">-</div><div class="sd" id="s_ram_d"></div></div>
+          <div class="spec"><div class="t">CPU 需求</div><div class="v" id="s_cpu">-</div></div>
+          <div class="spec"><div class="t">磁盘需求</div><div class="v" id="s_disk">-</div></div>
+          <div class="spec"><div class="t">带宽需求</div><div class="v" id="s_bw">-</div></div>
+        </div>
+        <div class="reco-box">
+          <div class="t">推荐配置档位</div>
+          <div class="v" id="r_tier">-</div>
+          <div class="d" id="r_form">-</div>
+          <div class="p" id="r_price">-</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div id="chartA" class="chart"></div>
+      <div class="chart-note">
+        两条模型线均由连接数爬坡实测拟合：<b style="color:#4aa8ff">蓝线=空闲</b>（只连不发，15.75 KB/连接）为下界，
+        <b style="color:#ff6b6b">红线=满负载</b>（每连接 1 msg/15s + 10 路订阅转发，38.76 KB/连接，约空闲 2.46 倍）为上界；
+        绿/红散点为两组实测（空闲 10 档、满负载 7 档），x 轴与实测覆盖一致（最高 50 000，无外推）。
+        选型按满负载上界取值，橙色点随当前输入移动。
+      </div>
+    </div>
+    <div class="card">
+      <div id="chartB" class="chart"></div>
+      <div class="chart-note">按当前参数计算的总带宽随节点数变化曲线；拖动左侧滑块观察增长趋势。</div>
+    </div>
+
+    <div class="card">
+      <details>
+        <summary>计算明细（公式对应《网络负载与成本建模》第 4–7 节）</summary>
+        <table>
+          <tr><th>节点侧上行带宽（含心跳）</th><td id="o_up">-</td></tr>
+          <tr><th>订阅端转发带宽</th><td id="o_down">-</td></tr>
+          <tr><th>内存需求（原始值）</th><td id="o_ram">-</td></tr>
+          <tr><th>CPU 需求（原始值）</th><td id="o_cpu">-</td></tr>
+          <tr><th>磁盘构成</th><td id="o_disk">-</td></tr>
+        </table>
+      </details>
+    </div>
+
+    <div class="foot">
+      本计算器只覆盖网络侧，节点硬件与供电成本暂不纳入；方法与系数详见
+      《网络负载与成本建模》《性能实验数据表》。整机参考价为 2026-06 市场量级，不绑定云厂商。
+    </div>
   </div>
 </div>
 
-<h2>计算结果</h2>
-<table id="out">
-  <tr><th>消息率 R</th><td id="o_rate">-</td></tr>
-  <tr><th>单条消息开销（节点→Broker）</th><td id="o_bmsg">-</td></tr>
-  <tr><th>节点侧上行带宽（含心跳）</th><td id="o_up">-</td></tr>
-  <tr><th>订阅端转发带宽</th><td id="o_down">-</td></tr>
-  <tr><th>服务器总带宽 W</th><td id="o_total">-</td></tr>
-  <tr><th>月流量</th><td id="o_month">-</td></tr>
-  <tr><th>内存需求（含 1.5 安全系数）</th><td id="o_ram">-</td></tr>
-  <tr><th>CPU 需求（含 1.5 安全系数）</th><td id="o_cpu">-</td></tr>
-  <tr><th>磁盘需求（保留期原始数据 + 系统盘）</th><td id="o_disk">-</td></tr>
-  <tr><th class="reco">推荐服务器配置</th><td class="reco" id="o_reco">-</td></tr>
-  <tr><th>整机参考价（2026-06 市场量级）</th><td id="o_price">-</td></tr>
-  <tr><th>带宽建议</th><td id="o_bw">-</td></tr>
-</table>
-
-<p class="hint">
-  系数来自 2026-06-11 抓包与压测实验校准（详见《网络负载与成本建模》《性能实验数据表》），
-  计算方法与文档第 4–7 节公式一一对应；本计算器只覆盖网络侧，节点硬件与供电成本暂不纳入。<br>
-  <a href="/">← 返回监控页</a>
-</p>
-
 <script>
-let cfg = null;
+let cfg = null, chartA = null, chartB = null;
 
 const TIERS = [
-  { label: "1C1G",  cores: 1,  ramMb: 1024,   price: "0–300 元（树莓派级/闲置旧机）" },
-  { label: "1C2G",  cores: 1,  ramMb: 2048,   price: "0–300 元（树莓派级/闲置旧机）" },
-  { label: "2C2G",  cores: 2,  ramMb: 2048,   price: "300–600 元（入门迷你主机/旧机）" },
-  { label: "2C4G",  cores: 2,  ramMb: 4096,   price: "600–1000 元（N100 级迷你主机）" },
-  { label: "4C8G",  cores: 4,  ramMb: 8192,   price: "1000–2000 元（迷你主机/入门塔式）" },
-  { label: "8C16G", cores: 8,  ramMb: 16384,  price: "2000–4000 元（塔式/二手服务器）" },
-  { label: "16C32G", cores: 16, ramMb: 32768, price: "4000–8000 元（工作站/二手服务器）" },
+  { label: "1C1G",  cores: 1,  ramMb: 1024,   price: "0–300 元", form: "树莓派级 / 闲置旧机" },
+  { label: "1C2G",  cores: 1,  ramMb: 2048,   price: "0–300 元", form: "树莓派级 / 闲置旧机" },
+  { label: "2C2G",  cores: 2,  ramMb: 2048,   price: "300–600 元", form: "入门迷你主机 / 旧机" },
+  { label: "2C4G",  cores: 2,  ramMb: 4096,   price: "600–1000 元", form: "N100 级迷你主机" },
+  { label: "4C8G",  cores: 4,  ramMb: 8192,   price: "1000–2000 元", form: "迷你主机 / 入门塔式" },
+  { label: "8C16G", cores: 8,  ramMb: 16384,  price: "2000–4000 元", form: "塔式 / 二手服务器" },
+  { label: "16C32G", cores: 16, ramMb: 32768, price: "4000–8000 元", form: "工作站 / 二手服务器" },
 ];
+
+const FONT = "'Microsoft YaHei', sans-serif";
+const AXIS = { line: "#243140", label: "#8b98a9", split: "#1c2733" };
 
 function val(id) { return document.getElementById(id).value; }
 function num(id) { return parseFloat(val(id)); }
@@ -96,86 +192,192 @@ function fmtBandwidth(bytesPerSec) {
   if (bps >= 1e6) return (bps / 1e6).toFixed(1) + " Mbps";
   return (bps / 1e3).toFixed(1) + " kbps";
 }
-
 function fmtVolume(bytes) {
   if (bytes >= 1e12) return (bytes / 1e12).toFixed(2) + " TB";
   return (bytes / 1e9).toFixed(1) + " GB";
 }
+function fmtRam(mb) { return mb >= 1024 ? "≥ " + (mb / 1024).toFixed(1) + " GB" : "≥ " + Math.ceil(mb) + " MB"; }
 
-function compute() {
-  if (!cfg) return null;
-  const n = num("n"), m = num("m"), t = num("t"), s = num("s"), dr = num("dr");
+function msgBytes() {
   const qos = val("qos"), fmt = val("fmt");
   const aliasOn = val("ver") === "5" && val("alias") === "on";
-  if (!(n > 0 && m > 0 && t > 0 && s > 0 && dr >= 0)) return null;
-
   let bPub = cfg.b_pub.qos1[fmt];
   let bDel = cfg.b_deliver[fmt];
   if (qos === "0") { bPub += cfg.b_pub.qos0_delta; bDel += cfg.b_pub.qos0_delta; }
   if (qos === "2") { bPub += cfg.b_pub.qos2_delta; bDel += cfg.b_pub.qos2_delta; }
   if (!aliasOn) bPub += cfg.b_pub.alias_off_delta;
+  return { bPub, bDel };
+}
 
+function bandwidthAt(nVal) {
+  const { bPub, bDel } = msgBytes();
+  const rate = nVal * num("m") / num("t");
+  const hb = num("t") >= cfg.keepalive_interval_s ? nVal * cfg.keepalive_bytes / cfg.keepalive_interval_s : 0;
+  return rate * bPub + hb + rate * num("s") * bDel;
+}
+
+// Two memory curves from the ramp experiments: idle (only connected) is the
+// lower bound, loaded (持续消息流) is the upper bound used for sizing.
+function ramIdleMb(nConns) { return (nConns + num("s")) * cfg.mem_idle_per_conn_kb / 1024 + cfg.mem_idle_base_mb; }
+function ramLoadedMb(nConns) { return (nConns + num("s")) * cfg.mem_loaded_per_conn_kb / 1024 + cfg.mem_loaded_base_mb; }
+
+function compute() {
+  if (!cfg) return null;
+  const n = num("n"), m = num("m"), t = num("t"), s = num("s"), dr = num("dr");
+  if (!(n > 0 && m > 0 && t > 0 && s > 0 && dr >= 0)) return null;
+  const { bPub } = msgBytes();
   const rate = n * m / t;
-  const heartbeat = t >= cfg.keepalive_interval_s ? n * cfg.keepalive_bytes / cfg.keepalive_interval_s : 0;
-  const uplink = rate * bPub + heartbeat;
-  const deliver = rate * s * bDel;
-  const total = uplink + deliver;
+  const uplink = rate * bPub + (t >= cfg.keepalive_interval_s ? n * cfg.keepalive_bytes / cfg.keepalive_interval_s : 0);
+  const total = bandwidthAt(n);
+  const deliver = total - uplink;
   const monthly = total * 86400 * 30;
-
-  const ramMb = ((n + s) * cfg.mem_per_conn_kb / 1024 + cfg.mem_base_mb) * cfg.safety_factor;
-  const cores = rate * (1 + s) / cfg.msgs_per_core * cfg.safety_factor;
+  const ramIdle = ramIdleMb(n);
+  const ramLoaded = ramLoadedMb(n);
+  const ramMb = ramLoaded * cfg.mem_loaded_safety;  // size for the loaded upper bound
+  const cores = rate * (1 + s) / cfg.msgs_per_core * cfg.cpu_safety;
   const diskGb = rate * cfg.record_bytes * 86400 * dr / 1e9 + 20;
   const bwMbps = total * 8 / 1e6 * cfg.bandwidth_safety;
-
   let tierIdx = TIERS.findIndex((x) => x.cores >= Math.max(1, Math.ceil(cores)) && x.ramMb >= ramMb);
-  if (tierIdx < 0) tierIdx = TIERS.length;  // beyond table
+  if (tierIdx < 0) tierIdx = TIERS.length;
   let bumped = false;
-  if (tierIdx < TIERS.length && diskGb > 100) { tierIdx += 1; bumped = true; }  // I/O headroom for big storage
+  if (tierIdx < TIERS.length && diskGb > 100) { tierIdx += 1; bumped = true; }
   const tier = tierIdx < TIERS.length ? TIERS[tierIdx] : null;
-
-  return { rate, bPub, uplink, deliver, total, monthly, ramMb, cores, diskGb, bwMbps, tier, bumped };
+  return { rate, bPub, uplink, deliver, total, monthly, ramIdle, ramLoaded, ramMb, cores, diskGb, bwMbps, tier, bumped };
 }
 
 function render() {
   const r = compute();
   if (!r) return;
-  setOut("o_rate", r.rate.toFixed(1) + " 条/秒");
-  setOut("o_bmsg", r.bPub.toFixed(1) + " 字节/条（含 TCP/IP 头、QoS 交互与 ACK 分摊）");
-  setOut("o_up", fmtBandwidth(r.uplink) + "（" + Math.round(r.uplink) + " B/s）");
-  setOut("o_down", fmtBandwidth(r.deliver) + "（订阅端 × " + val("s") + "）");
-  setOut("o_total", fmtBandwidth(r.total));
-  setOut("o_month", fmtVolume(r.monthly));
-  setOut("o_ram", Math.ceil(r.ramMb) + " MB");
-  setOut("o_cpu", r.cores < 0.1 ? "< 0.1 核" : r.cores.toFixed(1) + " 核");
-  setOut("o_disk", r.diskGb.toFixed(1) + " GB（保留 " + val("dr") + " 天）");
+  setOut("k_bw", fmtBandwidth(r.total));
+  setOut("k_bw_d", "上行 " + fmtBandwidth(r.uplink) + " · 转发 " + fmtBandwidth(r.deliver));
+  setOut("k_month", fmtVolume(r.monthly));
+  setOut("k_month_d", "总带宽 × 86400 × 30");
+  setOut("k_rate", r.rate >= 100 ? Math.round(r.rate) + " 条/秒" : r.rate.toFixed(1) + " 条/秒");
+  setOut("k_bmsg", r.bPub.toFixed(0) + " B/条");
+
+  setOut("s_ram", fmtRam(r.ramMb));
+  document.getElementById("s_ram_d").textContent =
+    "空闲 " + Math.ceil(r.ramIdle) + " ~ 满负载 " + Math.ceil(r.ramLoaded) + " MB";
+  setOut("s_cpu", r.cores < 0.1 ? "< 0.1 核" : "≥ " + r.cores.toFixed(1) + " 核");
+  setOut("s_disk", "≥ " + Math.ceil(r.diskGb) + " GB");
+  setOut("s_bw", "≥ " + (r.bwMbps >= 1 ? Math.ceil(r.bwMbps) + " Mbps" : "1 Mbps"));
   if (r.tier) {
-    setOut("o_reco", r.tier.label + (r.bumped ? "（存储量大，I/O 余量上调一档）" : "") +
-      "，磁盘 ≥ " + Math.ceil(r.diskGb / 50) * 50 + " GB");
-    setOut("o_price", r.tier.price);
+    setOut("r_tier", r.tier.label);
+    setOut("r_form", r.tier.form + " · 磁盘 " + Math.ceil(r.diskGb / 50) * 50 + " GB" + (r.bumped ? "（存储量大，档位上调）" : ""));
+    setOut("r_price", r.tier.price);
   } else {
-    setOut("o_reco", "超出单机推荐表，建议集群部署或专项评估");
-    setOut("o_price", "-");
+    setOut("r_tier", "集群部署");
+    setOut("r_form", "超出单机推荐表，需专项评估");
+    setOut("r_price", "—");
   }
-  setOut("o_bw", "≥ " + (r.bwMbps >= 1 ? Math.ceil(r.bwMbps) + " Mbps" : "1 Mbps") +
-    "（W × " + cfg.bandwidth_safety + " 安全系数；家庭/校园宽带通常已覆盖小场景）");
+
+  setOut("o_up", fmtBandwidth(r.uplink));
+  setOut("o_down", fmtBandwidth(r.deliver) + "（订阅端 × " + val("s") + "）");
+  setOut("o_ram", "空闲 " + Math.ceil(r.ramIdle) + " MB（" + cfg.mem_idle_per_conn_kb + " KB/连接）~ 满负载 "
+    + Math.ceil(r.ramLoaded) + " MB（" + cfg.mem_loaded_per_conn_kb + " KB/连接）；推荐按满负载 × " + cfg.mem_loaded_safety + " = " + Math.ceil(r.ramMb) + " MB");
+  setOut("o_cpu", (r.cores < 0.01 ? "<0.01" : r.cores.toFixed(2)) + " 核 = R × (1+S) ÷ " + cfg.msgs_per_core + " 条/秒/核，× " + cfg.cpu_safety);
+  setOut("o_disk", r.diskGb.toFixed(1) + " GB = 落库 " + cfg.record_bytes + " B/条 × " + val("dr") + " 天 + 系统盘 20 GB");
+
+  nSlider.value = nToSlider(num("n"));
+  drawCharts();
 }
 
-function preset(n, m, t, qos, fmt, s, dr) {
-  document.getElementById("n").value = n;
-  document.getElementById("m").value = m;
-  document.getElementById("t").value = t;
-  document.getElementById("qos").value = String(qos);
-  document.getElementById("fmt").value = fmt;
-  document.getElementById("s").value = s;
-  document.getElementById("dr").value = dr;
-  document.getElementById("ver").value = "5";
-  document.getElementById("alias").value = "on";
-  render();
+// ---- N 滑块（对数刻度 1..50000）----
+const NMAX_SLIDER = 50000;
+const nInput = document.getElementById("n");
+const nSlider = document.getElementById("nslider");
+function sliderToN(v) { return Math.max(1, Math.round(Math.pow(NMAX_SLIDER, v / 100))); }
+function nToSlider(n) { return Math.max(0, Math.min(100, 100 * Math.log(Math.max(1, n)) / Math.log(NMAX_SLIDER))); }
+nSlider.addEventListener("input", () => { nInput.value = sliderToN(parseFloat(nSlider.value)); render(); });
+
+// ---- ECharts（深色主题）----
+function axisCommon(name) {
+  return {
+    type: "value", name, nameTextStyle: { color: AXIS.label },
+    axisLine: { lineStyle: { color: AXIS.line } },
+    axisLabel: { color: AXIS.label },
+    splitLine: { lineStyle: { color: AXIS.split } },
+  };
+}
+const TOOLTIP = {
+  backgroundColor: "#1a2430", borderColor: "#243140",
+  textStyle: { color: "#e6edf3", fontSize: 12.5 },
+};
+
+function drawCharts() {
+  if (!cfg || !cfg.validation || !chartA) return;
+  const v = cfg.validation;
+  const XA = 50000;  // 与实测最高档一致，模型线不超出实测覆盖范围
+  const idleLine = [], loadedLine = [];
+  for (let x = 0; x <= XA; x += XA / 110) { idleLine.push([x, +ramIdleMb(x).toFixed(1)]); loadedLine.push([x, +ramLoadedMb(x).toFixed(1)]); }
+  const nNow = Math.min(num("n") || 1, XA);
+  chartA.setOption({
+    animationDurationUpdate: 400,
+    textStyle: { fontFamily: FONT },
+    title: { text: "内存需求：空闲 vs 满负载双模型 × 压测实测（覆盖 1k–50k 连接，无外推）", left: 4, textStyle: { fontSize: 14, color: "#e6edf3" } },
+    tooltip: { ...TOOLTIP, trigger: "item", formatter: (p) => {
+      const head = p.seriesName + "<br>" + (p.value[0] >= 1000 ? (p.value[0] / 1000) + "k" : p.value[0]) + " 连接：<b>" + p.value[1] + " MB</b>";
+      return p.seriesId === "loaded_pts"
+        ? head + "<br><span style='color:#8b98a9'>" + v.load_profile + "</span>"
+        : head;
+    } },
+    legend: { top: 2, right: 4, textStyle: { color: "#8b98a9", fontSize: 11.5 }, itemWidth: 16 },
+    grid: { left: 58, right: 30, top: 58, bottom: 44 },
+    xAxis: { ...axisCommon("连接数"), max: XA, axisLabel: { color: AXIS.label, formatter: (x) => x / 1000 + "k" } },
+    yAxis: axisCommon("MB"),
+    series: [
+      { id: "loaded", name: "满负载模型（上界，用于选型）", type: "line", showSymbol: false, data: loadedLine,
+        lineStyle: { width: 2.5 }, color: "#ff6b6b" },
+      { id: "idle", name: "空闲模型（下界）", type: "line", showSymbol: false, data: idleLine,
+        lineStyle: { width: 2.5 }, color: "#4aa8ff" },
+      { id: "loaded_pts", name: "实测：满负载爬坡 7 档", type: "scatter", data: v.loaded_ramp, symbolSize: 11, color: "#ff6b6b",
+        label: { show: true, formatter: (p) => Math.round(p.value[1]), position: "top", color: "#ff8f8f", fontSize: 10 } },
+      { id: "idle_pts", name: "实测：空闲爬坡 10 档", type: "scatter", data: v.idle_ramp, symbolSize: 10, color: "#00d68f",
+        label: { show: true, formatter: (p) => Math.round(p.value[1]), position: "bottom", color: "#00d68f", fontSize: 9.5 } },
+      { id: "cur", name: "当前输入 N（满负载）", type: "scatter", data: [[nNow, +ramLoadedMb(nNow).toFixed(1)]], symbolSize: 15, color: "#ffb020",
+        label: { show: true, formatter: "当前", position: "top", color: "#ffb020", fontSize: 11 } },
+    ],
+  });
+
+  const nCur = num("n") || 1;
+  const XB = Math.max(Math.ceil(nCur * 2 / 50) * 50, 100);
+  const maxBw = bandwidthAt(XB) * 8;
+  const useMbps = maxBw >= 1.5e6;
+  const scale = useMbps ? 8 / 1e6 : 8 / 1e3;
+  const bwLine = [];
+  for (let x = 0; x <= XB; x += XB / 110) bwLine.push([Math.round(x), +(bandwidthAt(x) * scale).toFixed(2)]);
+  chartB.setOption({
+    animationDurationUpdate: 400,
+    textStyle: { fontFamily: FONT },
+    title: { text: "总带宽随节点数变化（其余参数取当前值）", left: 4, textStyle: { fontSize: 14.5, color: "#e6edf3" } },
+    tooltip: { ...TOOLTIP, trigger: "axis", formatter: (ps) => {
+      const p = ps[0]; return p.value[0] + " 节点：<b>" + p.value[1] + " " + (useMbps ? "Mbps" : "kbps") + "</b>"; } },
+    legend: { top: 2, right: 4, textStyle: { color: "#8b98a9", fontSize: 12 } },
+    grid: { left: 58, right: 24, top: 58, bottom: 44 },
+    xAxis: { ...axisCommon("节点数"), max: XB,
+      axisLabel: { color: AXIS.label, formatter: (x) => XB >= 2000 ? x / 1000 + "k" : x } },
+    yAxis: axisCommon(useMbps ? "Mbps" : "kbps"),
+    series: [
+      { id: "bw", name: "总带宽 W（上行 + 转发）", type: "line", showSymbol: false, data: bwLine,
+        lineStyle: { width: 2.5 }, color: "#4aa8ff",
+        areaStyle: { color: { type: "linear", x: 0, y: 0, x2: 0, y2: 1,
+          colorStops: [{ offset: 0, color: "rgba(74,168,255,.22)" }, { offset: 1, color: "rgba(74,168,255,.02)" }] } } },
+      { id: "curB", name: "当前输入", type: "scatter", data: [[nCur, +(bandwidthAt(nCur) * scale).toFixed(2)]],
+        symbolSize: 14, color: "#ffb020",
+        label: { show: true, formatter: "当前", position: "top", color: "#ffb020", fontSize: 11 } },
+    ],
+  });
 }
 
 document.querySelectorAll("input, select").forEach((el) => el.addEventListener("input", render));
 
-fetch("/api/calc_config").then((r) => r.json()).then((data) => { cfg = data; render(); });
+fetch("/api/calc_config").then((r) => r.json()).then((data) => {
+  cfg = data;
+  chartA = echarts.init(document.getElementById("chartA"));
+  chartB = echarts.init(document.getElementById("chartB"));
+  window.addEventListener("resize", () => { chartA.resize(); chartB.resize(); });
+  render();
+});
 </script>
 </body>
 </html>

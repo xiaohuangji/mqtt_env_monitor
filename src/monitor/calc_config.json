@@ -1,5 +1,5 @@
 {
-  "calibrated_at": "2026-06-11",
+  "calibrated_at": "2026-06-12",
   "source": "docs/project_outputs/测试证据/性能实验数据表.md",
   "b_pub": {
     "qos1": {"json": 261.9, "json-min": 203.0, "msgpack": 185.9},
@@ -10,10 +10,19 @@
   "b_deliver": {"json": 283.0, "json-min": 224.0, "msgpack": 207.0},
   "keepalive_bytes": 116,
   "keepalive_interval_s": 60,
-  "mem_per_conn_kb": 15.3,
-  "mem_base_mb": 283,
+  "mem_idle_per_conn_kb": 15.75,
+  "mem_idle_base_mb": 340,
+  "mem_loaded_per_conn_kb": 38.76,
+  "mem_loaded_base_mb": 515,
+  "mem_loaded_safety": 1.25,
   "msgs_per_core": 19000,
   "record_bytes": 100,
-  "safety_factor": 1.5,
-  "bandwidth_safety": 1.25
+  "cpu_safety": 1.5,
+  "bandwidth_safety": 1.25,
+  "validation": {
+    "idle_ramp": [[1000, 302.6], [3000, 355.7], [5000, 407.1], [8000, 484.8], [10000, 526.5], [15000, 616.4], [20000, 661.1], [30000, 790.8], [40000, 1001.2], [50000, 1053.9]],
+    "loaded_ramp": [[5000, 632.0], [10000, 832.8], [15000, 1038.2], [20000, 1584.8], [30000, 1647.0], [40000, 1828.1], [50000, 2479.3]],
+    "load_profile": "每连接每 15 秒发布一条 + 10 路订阅全量转发（聚合约 N/15 条/秒）",
+    "max_measured_conns": 50000
+  }
 }
