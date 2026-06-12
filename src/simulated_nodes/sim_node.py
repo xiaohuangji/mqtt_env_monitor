@@ -35,6 +35,9 @@ SIM_PROFILES = {
     "humidity": {"unit": "%RH", "base": 58.0, "revert": 0.05, "sigma": 0.8, "min": 20.0, "max": 90.0, "ndigits": 1},
     "light": {"unit": "lux", "base": 420.0, "revert": 0.05, "sigma": 25.0, "min": 0.0, "max": 1000.0, "ndigits": 1},
     "noise": {"unit": "dB", "base": 48.0, "revert": 0.10, "sigma": 2.5, "min": 30.0, "max": 90.0, "ndigits": 1},
+    # ESP32 hardware-node types (issue #34): MQ-2 raw ADC, FC-28 as percent.
+    "smoke": {"unit": "ADC", "base": 600.0, "revert": 0.05, "sigma": 30.0, "min": 0.0, "max": 4095.0, "ndigits": 0},
+    "soil_moisture": {"unit": "%", "base": 45.0, "revert": 0.05, "sigma": 1.5, "min": 0.0, "max": 100.0, "ndigits": 1},
 }
 
 
@@ -85,7 +88,8 @@ class DataSimulator:
     def next_value(self) -> float:
         self.value += self.revert * (self.base - self.value) + random.gauss(0, self.sigma)
         self.value = min(max(self.value, self.minimum), self.maximum)
-        return round(self.value, self.ndigits)
+        rounded = round(self.value, self.ndigits)
+        return int(rounded) if self.ndigits == 0 else rounded
 
 
 def now_iso() -> str:

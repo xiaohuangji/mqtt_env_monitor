@@ -16,6 +16,7 @@
   "mem_loaded_base_mb": 515,
   "mem_loaded_safety": 1.25,
   "msgs_per_core": 19000,
+  "nodes_per_ap": 200,
   "record_bytes": 100,
   "cpu_safety": 1.5,
   "bandwidth_safety": 1.25,
