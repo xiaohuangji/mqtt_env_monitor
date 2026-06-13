@@ -37,7 +37,7 @@ DATA_TYPE_CN = {
     "pressure": "气压",
     "co2": "二氧化碳浓度",
     "pm25": "PM2.5",
-    "smoke": "烟雾",
+    "mq2_gas": "可燃气体",
     "soil_moisture": "土壤湿度",
 }
 
@@ -50,7 +50,7 @@ UNIT_BY_TYPE = {
     "pressure": "hPa",
     "co2": "ppm",
     "pm25": "ug/m3",
-    "smoke": "ADC",       # MQ-2 原始模数值(0-4095),阈值标定后可换算 ppm
+    "mq2_gas": "raw",      # MQ-2 原始 ADC 值(0-4095),阈值标定后可换算 ppm
     "soil_moisture": "%",  # FC-28 换算为百分比
 }
 
