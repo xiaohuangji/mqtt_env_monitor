@@ -60,8 +60,7 @@
 1. **服务器侧自检**（用 PC 模拟节点替 ESP32 先验，确认 Broker + 监控端 + 端口映射就绪）：
 
    ```powershell
-   D:\anaconda\python.exe src\simulated_nodes\sim_node.py --host 192.168.137.1 --node-id node03 ^
-     --types temperature,humidity,mq2_gas,soil_moisture --format json --mqtt-version 311 --qos 1 --count 5
+   D:\anaconda\python.exe src\simulated_nodes\sim_node.py --host 192.168.137.1 --node-id node03 --types temperature,humidity,mq2_gas,soil_moisture --format json --mqtt-version 311 --qos 1 --count 5
    ```
 
    浏览器开 `http://127.0.0.1:8080/`，出现 node03 的温度/湿度/可燃气体/土壤湿度 = 服务器侧链路 OK。
