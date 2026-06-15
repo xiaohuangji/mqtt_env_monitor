@@ -37,6 +37,7 @@ SIM_PROFILES = {
     "noise": {"unit": "dB", "base": 48.0, "revert": 0.10, "sigma": 2.5, "min": 30.0, "max": 90.0, "ndigits": 1},
     # ESP32 hardware-node types (issue #34, 命名对齐孙博宇固件): MQ-2 raw ADC, FC-28 as percent.
     "mq2_gas": {"unit": "raw", "base": 600.0, "revert": 0.05, "sigma": 30.0, "min": 0.0, "max": 4095.0, "ndigits": 0},
+    "smoke": {"unit": "raw", "base": 600.0, "revert": 0.05, "sigma": 30.0, "min": 0.0, "max": 4095.0, "ndigits": 0},
     "soil_moisture": {"unit": "%", "base": 45.0, "revert": 0.05, "sigma": 1.5, "min": 0.0, "max": 100.0, "ndigits": 1},
 }
 

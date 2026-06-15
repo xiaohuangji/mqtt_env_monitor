@@ -38,6 +38,7 @@ DATA_TYPE_CN = {
     "co2": "二氧化碳浓度",
     "pm25": "PM2.5",
     "mq2_gas": "可燃气体",
+    "smoke": "可燃气体",
     "soil_moisture": "土壤湿度",
 }
 
@@ -51,6 +52,7 @@ UNIT_BY_TYPE = {
     "co2": "ppm",
     "pm25": "ug/m3",
     "mq2_gas": "raw",      # MQ-2 原始 ADC 值(0-4095),阈值标定后可换算 ppm
+    "smoke": "raw",        # MQ-2 的另一命名(见 Issue #42),与 mq2_gas 等价
     "soil_moisture": "%",  # FC-28 换算为百分比
 }
 
