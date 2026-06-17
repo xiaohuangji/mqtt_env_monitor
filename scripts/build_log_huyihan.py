@@ -13,11 +13,9 @@ from docx.oxml import OxmlElement
 
 CIRCLED = "①②③④⑤⑥⑦⑧⑨⑩⑪⑫⑬⑭⑮"
 
-doc = Document()
-s = doc.sections[0]
-s.page_width, s.page_height = Cm(21.0), Cm(29.7)
-s.top_margin = s.bottom_margin = Cm(2.5)
-s.left_margin = s.right_margin = Cm(2.6)
+SRC = r"C:\Users\28445\xwechat_files\wxid_9relx9qlac3112_8721\msg\file\2026-06\《数据通信与网络技术》课设日志.docx"
+OUT = "docs/team/daily/胡艺瀚_课程设计日志.docx"
+doc = Document(SRC)  # 只读孙博宇原件（含其封面：校徽/校名/排版），改完另存为 OUT；下面删正文、改字段
 
 
 def set_font(run, cn="宋体", en="Times New Roman", size=12, bold=False, color=(0, 0, 0)):
@@ -61,8 +59,23 @@ def items(lst):
         set_font(p.add_run(pre + " " + t), "宋体", "Times New Roman", 12)
 
 
+def _grid(t):
+    tblPr = t._tbl.tblPr
+    b = OxmlElement("w:tblBorders")
+    for edge in ("top", "left", "bottom", "right", "insideH", "insideV"):
+        e = OxmlElement("w:" + edge)
+        e.set(qn("w:val"), "single"); e.set(qn("w:sz"), "4"); e.set(qn("w:space"), "0"); e.set(qn("w:color"), "000000")
+        b.append(e)
+    tblPr.append(b)
+
+
 def table(headers, rows, widths=None):
-    t = doc.add_table(rows=1, cols=len(headers)); t.style = "Table Grid"; t.alignment = WD_TABLE_ALIGNMENT.CENTER
+    t = doc.add_table(rows=1, cols=len(headers)); t.alignment = WD_TABLE_ALIGNMENT.CENTER
+    try:
+        t.style = "Table Grid"
+    except KeyError:
+        pass
+    _grid(t)
     for i, h in enumerate(headers):
         c = t.rows[0].cells[i]; c.paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
         set_font(c.paragraphs[0].add_run(h), "黑体", "Arial", 10.5, bold=True)
@@ -77,37 +90,37 @@ def table(headers, rows, widths=None):
     doc.add_paragraph().paragraph_format.space_after = Pt(2)
 
 
-# ===================== 封面页 =====================
-LOGO = "docs/team/daily/changan_logo.png"
-NAME = "docs/team/daily/changan_name.png"
-doc.add_paragraph()
-p = doc.add_paragraph(); p.alignment = WD_ALIGN_PARAGRAPH.CENTER
-p.add_run().add_picture(LOGO, height=Cm(2.3)); p.add_run("   ")
-p.add_run().add_picture(NAME, height=Cm(1.9))
-for _ in range(3):
-    doc.add_paragraph()
-p = doc.add_paragraph(); p.alignment = WD_ALIGN_PARAGRAPH.CENTER; p.paragraph_format.space_after = Pt(6)
-set_font(p.add_run("《数据通信与网络课程设计》课程设计日志"), "黑体", "Arial", 18, bold=True)
-for _ in range(6):
-    doc.add_paragraph()
-for k, v in [
-    ("课设题目", "基于 MQTT 的多节点环境监测系统设计"),
-    ("所在小组", ""),
-    ("学生姓名", "胡艺瀚"),
-    ("学    号", "2023905925"),
-    ("班    级", "2023240303"),
-    ("小组成员", "孙博宇、韦煜城、曾家豪"),
-    ("本人主要分工", "软件设计与系统集成（MQTT 方案、网络负载与成本建模、需求计算器、Web 监控端、性能与压测）及项目流程推进"),
-    ("指导老师", "和洁，傅攀峰，刘若辰"),
-    ("时    间", "2026 年 6 月"),
-]:
-    cp = doc.add_paragraph(); cp.paragraph_format.left_indent = Cm(3.0); cp.paragraph_format.line_spacing = 1.5
-    set_font(cp.add_run("%s：%s" % (k, v)), "宋体", "Times New Roman", 13, bold=True)
-for _ in range(6):
-    doc.add_paragraph()
-p = doc.add_paragraph(); p.alignment = WD_ALIGN_PARAGRAPH.CENTER
-set_font(p.add_run("信息工程学院"), "黑体", "Arial", 15, bold=True)
-doc.add_page_break()
+# ============ 复用孙博宇封面：删掉他的正文、改封面字段 ============
+# 1) 删除孙博宇正文（从他的“第 1 个工作日”到结尾，保留封面与节属性 sectPr）
+_body = doc.element.body
+_elems = list(_body)
+_start = None
+for _i, _el in enumerate(_elems):
+    if _el.tag == qn("w:p"):
+        _txt = "".join((_t.text or "") for _t in _el.iter(qn("w:t")))
+        if _txt.strip().startswith("第 1 个工作日"):
+            _start = _i; break
+if _start is not None:
+    for _el in _elems[_start:]:
+        if _el.tag in (qn("w:p"), qn("w:tbl")):
+            _body.remove(_el)
+# 2) 改封面字段（仅替换冒号后的值，保留原标签与格式）
+_COVER = {"学生姓名": "胡艺瀚", "学号": "2023905925", "班级": "2023240303",
+          "小组成员": "孙博宇、韦煜城、曾家豪", "本人主要分工": "软件设计、性能测试与项目推进"}
+def _set_text(p, text):
+    if p.runs:
+        p.runs[0].text = text
+        for r in p.runs[1:]:
+            r.text = ""
+    else:
+        p.add_run(text)
+for p in doc.paragraphs:
+    if "：" not in p.text:
+        continue
+    _lab = p.text.split("：", 1)[0]
+    _key = _lab.replace(" ", "").replace("　", "")
+    if _key in _COVER:
+        _set_text(p, _lab + "：" + _COVER[_key])
 
 # ===================== 工作日 =====================
 DAYS = [
