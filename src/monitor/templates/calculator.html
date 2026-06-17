@@ -42,8 +42,9 @@
   .kpi .d { font-size: 11.5px; color: var(--txt3); margin-top: 5px; }
 
   .server { display: grid; grid-template-columns: 1fr auto; gap: 18px; align-items: center; }
-  .specs { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 12px; }
-  .spec { background: var(--card2); border: 1px solid var(--line); border-radius: 10px; padding: 11px 14px; }
+  .specs { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+  .spec { background: var(--card2); border: 1px solid var(--line); border-radius: 10px; padding: 11px 14px; min-width: 0; }
+  @media (max-width: 760px) { .specs { grid-template-columns: repeat(2, 1fr); } .server { grid-template-columns: 1fr; } }
   .spec .t { font-size: 11.5px; color: var(--txt2); margin-bottom: 5px; }
   .spec .v { font-size: 19px; font-weight: 700; color: var(--txt); font-variant-numeric: tabular-nums; }
   .spec .sd { font-size: 10.5px; color: var(--txt3); margin-top: 4px; }
@@ -123,7 +124,6 @@
           <div class="spec"><div class="t">CPU 需求</div><div class="v" id="s_cpu">-</div></div>
           <div class="spec"><div class="t">磁盘需求</div><div class="v" id="s_disk">-</div></div>
           <div class="spec"><div class="t">带宽需求</div><div class="v" id="s_bw">-</div></div>
-          <div class="spec"><div class="t">接入层 AP 数</div><div class="v" id="s_ap">-</div><div class="sd">每 AP 约 200 节点,瓶颈为关联数</div></div>
         </div>
         <div class="reco-box">
           <div class="t">推荐配置档位</div>
@@ -157,6 +157,7 @@
           <tr><th>内存需求（原始值）</th><td id="o_ram">-</td></tr>
           <tr><th>CPU 需求（原始值）</th><td id="o_cpu">-</td></tr>
           <tr><th>磁盘构成</th><td id="o_disk">-</td></tr>
+          <tr><th>接入层容量校验</th><td id="o_ap">-</td></tr>
         </table>
       </details>
     </div>
@@ -262,7 +263,9 @@ function render() {
   setOut("s_cpu", r.cores < 0.1 ? "< 0.1 核" : "≥ " + r.cores.toFixed(1) + " 核");
   setOut("s_disk", "≥ " + Math.ceil(r.diskGb) + " GB");
   setOut("s_bw", "≥ " + (r.bwMbps >= 1 ? Math.ceil(r.bwMbps) + " Mbps" : "1 Mbps"));
-  setOut("s_ap", "约 " + Math.max(1, Math.ceil(num("n") / (cfg.nodes_per_ap || 200))) + " 个");
+  const apCount = Math.max(1, Math.ceil(num("n") / (cfg.nodes_per_ap || 200)));
+  setOut("o_ap", "约 " + apCount + " 个 AP（按每 AP " + (cfg.nodes_per_ap || 200)
+    + " 个终端关联估算）；校园场景复用既有校园 Wi-Fi、无需自建，此处仅为接入层容量校验，不计入服务器成本。");
   if (r.tier) {
     setOut("r_tier", r.tier.label);
     setOut("r_form", r.tier.form + " · 磁盘 " + Math.ceil(r.diskGb / 50) * 50 + " GB" + (r.bumped ? "（存储量大，档位上调）" : ""));
