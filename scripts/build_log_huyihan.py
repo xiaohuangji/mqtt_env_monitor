@@ -77,9 +77,19 @@ def table(headers, rows, widths=None):
     doc.add_paragraph().paragraph_format.space_after = Pt(2)
 
 
-# ===================== 封面信息块 =====================
-p = doc.add_paragraph(); p.alignment = WD_ALIGN_PARAGRAPH.CENTER; p.paragraph_format.space_after = Pt(10)
-set_font(p.add_run("《数据通信与网络课程设计》课程设计日志"), "黑体", "Arial", 16, bold=True)
+# ===================== 封面页 =====================
+LOGO = "docs/team/daily/changan_logo.png"
+NAME = "docs/team/daily/changan_name.png"
+doc.add_paragraph()
+p = doc.add_paragraph(); p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+p.add_run().add_picture(LOGO, height=Cm(2.3)); p.add_run("   ")
+p.add_run().add_picture(NAME, height=Cm(1.9))
+for _ in range(3):
+    doc.add_paragraph()
+p = doc.add_paragraph(); p.alignment = WD_ALIGN_PARAGRAPH.CENTER; p.paragraph_format.space_after = Pt(6)
+set_font(p.add_run("《数据通信与网络课程设计》课程设计日志"), "黑体", "Arial", 18, bold=True)
+for _ in range(6):
+    doc.add_paragraph()
 for k, v in [
     ("课设题目", "基于 MQTT 的多节点环境监测系统设计"),
     ("所在小组", ""),
@@ -91,8 +101,13 @@ for k, v in [
     ("指导老师", "和洁，傅攀峰，刘若辰"),
     ("时    间", "2026 年 6 月"),
 ]:
-    info("%s：%s" % (k, v))
-info("信息工程学院")
+    cp = doc.add_paragraph(); cp.paragraph_format.left_indent = Cm(3.0); cp.paragraph_format.line_spacing = 1.5
+    set_font(cp.add_run("%s：%s" % (k, v)), "宋体", "Times New Roman", 13, bold=True)
+for _ in range(6):
+    doc.add_paragraph()
+p = doc.add_paragraph(); p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+set_font(p.add_run("信息工程学院"), "黑体", "Arial", 15, bold=True)
+doc.add_page_break()
 
 # ===================== 工作日 =====================
 DAYS = [
