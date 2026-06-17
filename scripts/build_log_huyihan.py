@@ -30,33 +30,39 @@ def set_font(run, cn="宋体", en="Times New Roman", size=12, bold=False, color=
     rf.set(qn("w:eastAsia"), cn); rf.set(qn("w:ascii"), en); rf.set(qn("w:hAnsi"), en)
 
 
-def info(text):
-    p = doc.add_paragraph(); p.paragraph_format.line_spacing = 1.4; p.paragraph_format.space_after = Pt(0)
-    set_font(p.add_run(text), "宋体", "Times New Roman", 12)
+def info(text):  # 日期行：Normal 样式，字号继承孙博宇
+    doc.add_paragraph().add_run(text)
 
 
-def h3(text):
-    p = doc.add_paragraph(style="Heading 3")
-    p.paragraph_format.space_before = Pt(10); p.paragraph_format.space_after = Pt(4)
-    set_font(p.add_run(text), "黑体", "Arial", 13, bold=True)
+def h3(text):  # 工作日标题：用孙博宇的 Heading 3 样式（16pt），不覆盖字体字号
+    doc.add_paragraph(text, style="Heading 3")
 
 
-def label(text):
-    p = doc.add_paragraph(); p.paragraph_format.space_before = Pt(4); p.paragraph_format.space_after = Pt(2)
-    set_font(p.add_run(text), "黑体", "Arial", 12, bold=True)
+def label(text):  # 小节标题：Normal + 加粗，字号继承
+    r = doc.add_paragraph().add_run(text); r.bold = True
 
 
-def body(text):
-    p = doc.add_paragraph(); p.paragraph_format.line_spacing = 1.25
-    p.paragraph_format.space_after = Pt(2); p.paragraph_format.first_line_indent = Pt(24)
-    set_font(p.add_run(text), "宋体", "Times New Roman", 12)
+def body(text):  # 正文：无首行缩进、1.35 行距，字号继承（与孙博宇一致）
+    p = doc.add_paragraph(); p.paragraph_format.line_spacing = 1.35
+    p.add_run(text)
 
 
-def items(lst):
+def items(lst):  # ①②③ 条目：Normal，字号继承
     for i, t in enumerate(lst):
-        p = doc.add_paragraph(); p.paragraph_format.line_spacing = 1.25; p.paragraph_format.space_after = Pt(1)
+        p = doc.add_paragraph(); p.paragraph_format.line_spacing = 1.35
         pre = CIRCLED[i] if i < len(CIRCLED) else "·"
-        set_font(p.add_run(pre + " " + t), "宋体", "Times New Roman", 12)
+        p.add_run(pre + " " + t)
+
+
+def sep():  # 工作日之间的分割横线（复刻孙博宇：空段 + 下边框 single/sz6/space1 + 段后 6pt）
+    p = doc.add_paragraph()
+    pPr = p._p.get_or_add_pPr()
+    pBdr = OxmlElement("w:pBdr")
+    bottom = OxmlElement("w:bottom")
+    bottom.set(qn("w:val"), "single"); bottom.set(qn("w:sz"), "6")
+    bottom.set(qn("w:space"), "1"); bottom.set(qn("w:color"), "auto")
+    pBdr.append(bottom); pPr.append(pBdr)
+    sp = OxmlElement("w:spacing"); sp.set(qn("w:after"), "120"); pPr.append(sp)
 
 
 def _grid(t):
@@ -78,11 +84,11 @@ def table(headers, rows, widths=None):
     _grid(t)
     for i, h in enumerate(headers):
         c = t.rows[0].cells[i]; c.paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
-        set_font(c.paragraphs[0].add_run(h), "黑体", "Arial", 10.5, bold=True)
+        set_font(c.paragraphs[0].add_run(h), "黑体", "Arial", 9, bold=True)
     for row in rows:
         cells = t.add_row().cells
         for i, v in enumerate(row):
-            set_font(cells[i].paragraphs[0].add_run(str(v)), "宋体", "Times New Roman", 10.5)
+            set_font(cells[i].paragraphs[0].add_run(str(v)), "宋体", "Times New Roman", 9)
     if widths:
         for i, w in enumerate(widths):
             for r in t.rows:
@@ -274,6 +280,7 @@ for title, date, content, tasks, probs, sols, res, plans in DAYS:
     label("4. 解决方法"); items(sols)
     label("5. 今日成果"); items(res)
     label("6. 明日计划"); items(plans)
+    sep()
 
 # ===================== 个人总结 =====================
 h3("个人总结")
