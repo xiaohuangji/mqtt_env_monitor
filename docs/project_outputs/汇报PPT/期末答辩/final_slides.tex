@@ -174,6 +174,31 @@
   二、方案设计与实测验证
 \end{frame}
 
+\begin{frame}{为什么选 MQTT：与 HTTP 的对比}
+  \vspace{8pt}
+  {\footnotesize
+  \begin{itemize}\itemsep=8pt
+    \item \textbf{发布 / 订阅}：Broker 主动推送，实时、天然多对多（HTTP 靠客户端轮询）
+    \item \textbf{报文头极小 + 长连接复用}：每条只带极小协议头（HTTP 每条都重发整套头，还可能重建连接）
+    \item \textbf{持久会话 + QoS + 重连}：断线可补发、可感知离线（HTTP 无状态，需自行实现）
+  \end{itemize}}
+  \vspace{2pt}
+  \begin{beamercolorbox}[rounded=true, sep=7pt]{takeaway}
+    \begin{center}
+      {\footnotesize\textbf{实测 · 上传同一条数据的应用层字节（N = 200）}}\\[5pt]
+      {\scriptsize
+      \setlength{\tabcolsep}{9pt}\renewcommand{\arraystretch}{1.2}
+      \begin{tabular}{@{}l r r r@{}}
+        \textbf{payload 格式} & \textcolor{mLightBrown}{\textbf{MQTT}} & \textbf{HTTP} & \textbf{MQTT 省} \\
+        json（122 B）    & 163 B & 463 B & 65\,\% \\
+        json-min（65 B） & 105 B & 405 B & 74\,\% \\
+        msgpack（49 B）  & 89 B  & 392 B & 77\,\% \\
+      \end{tabular}}\\[5pt]
+      {\footnotesize 协议头开销恒定：MQTT 约 \textbf{40 B} vs HTTP 约 \textbf{340 B}（约 1/8）；数据越小，MQTT 越省。}
+    \end{center}
+  \end{beamercolorbox}
+\end{frame}
+
 \begin{frame}{系统总体架构}
   \vspace{10pt}
   \begin{center}
@@ -254,7 +279,9 @@
 \end{frame}
 
 \begin{frame}{服务质量保障：QoS 1 + 持久会话 + 重连}
-  \vspace{14pt}
+  \vspace{4pt}
+  {\footnotesize\color{black!60} TCP 已保证\textbf{连接内}不丢包；QoS 要解决的是\textbf{连接断开}（broker 重启 / 节点掉线重连）时消息不丢。}
+  \vspace{10pt}
   \begin{center}
     \begin{tikzpicture}[
         card/.style={draw=mLightBrown!55, rounded corners=4pt, fill=mLightBrown!8, align=center,
@@ -264,19 +291,20 @@
       \node[card, right=0.6cm of b] (c) {{\large\textbf{自动重连}}\\[8pt]{\footnotesize\color{black!70} 断网恢复后续传\\无需人工干预}};
     \end{tikzpicture}
   \end{center}
-  \takeaway{即便压到最小配置，也守住到达率与延迟}
+  \takeaway{QoS 1（至少一次）+ 持久会话扛掉线重连；重复由 \texttt{seq} 去重，无需 QoS 2 —— 不丢、不重、还省}
 \end{frame}
 
 \begin{frame}{实测佐证 · QoS × 丢包}
   \vspace{2pt}
   \begin{columns}[c]
     \begin{column}{0.34\textwidth}
-      \bignum{100\%}{0–15\% 丢包下\\ 三种 QoS 到达率\\ 均 100\%（TCP 重传）}
+      \bignum{100\%}{0–15\% 丢包下\\ 三种 QoS 到达率\\ 均 100\%（靠 TCP 重传）}
     \end{column}
     \begin{column}{0.64\textwidth}
       \centering\includegraphics[width=\linewidth, height=0.66\textheight, keepaspectratio]{images/exp_qos_loss.png}
     \end{column}
   \end{columns}
+  \takeaway{三种 QoS 都 100\%，恰恰说明\textbf{抗丢包是 TCP 的事、不是 QoS 的事}；QoS 的价值在\textbf{断连}场景 —— 故选 QoS 1 + 持久会话（跨公网重连 5.2 s 仍零丢失）}
 \end{frame}
 
 \begin{frame}{实测佐证 · 跨公网延迟}
@@ -313,24 +341,6 @@
   \chartcap{images/exp_memory.png}{满负载每连接内存 38.76 KB，是空闲的 2.46 倍 —— 选型必须按满负载上界}
 \end{frame}
 
-\begin{frame}{实测佐证 · 实景压测（1/2）：连接零掉线 · 转发满速}
-  \statline{2 万连接 \quad·\quad 30 min 零掉线 \quad·\quad 送达 99.96\%}
-  \vspace{4pt}
-  \begin{center}
-    \includegraphics[width=0.88\textwidth, height=0.32\textheight, keepaspectratio]{images/exp_stress_conn.png}\\[8pt]
-    \includegraphics[width=0.88\textwidth, height=0.32\textheight, keepaspectratio]{images/exp_stress_tput.png}
-  \end{center}
-\end{frame}
-
-\begin{frame}{实测佐证 · 实景压测（2/2）：资源占用极低}
-  \vspace{4pt}
-  \begin{center}
-    \includegraphics[width=0.88\textwidth, height=0.32\textheight, keepaspectratio]{images/exp_stress_cpu.png}\\[8pt]
-    \includegraphics[width=0.88\textwidth, height=0.32\textheight, keepaspectratio]{images/exp_stress_mem.png}
-  \end{center}
-  \takeaway{2 万连接满载仅 CPU 约 1.1 核 · 内存约 1.5 GB —— 资源占用极低，与容量建模预测吻合}
-\end{frame}
-
 \begin{frame}{资源计算器：把方法固化成工具}
   \vspace{6pt}
   \begin{center}
@@ -355,60 +365,82 @@
   \end{center}
 \end{frame}
 
-\begin{frame}{ESP32-C3 硬件节点：组成与配网}
-  \vspace{4pt}
+\begin{frame}{ESP32-C3 硬件节点：组成与传感器接入}
+  \vspace{2pt}
   \begin{columns}[T]
-    \begin{column}{0.50\textwidth}
-      \textbf{\footnotesize 传感器接入（模块化、可扩展）}\\[4pt]
+    \begin{column}{0.40\textwidth}
+      \textbf{\footnotesize 传感器接入（模块化、可扩展）}\\[3pt]
       {\scriptsize
-      \begin{tabular}{lll}
+      \begin{tabular}{@{}lll@{}}
         \toprule
         传感器 & 接口 & 采集量 \\
         \midrule
-        DHT11 & GPIO0 & 温度 · 湿度 \\
-        BH1750 & I2C & 光照 \\
+        DHT11 & GPIO5 & 温度 · 湿度 \\
+        BH1750 & I2C (GPIO1/2) & 光照 \\
         FC-28 & GPIO3 & 土壤湿度 \\
         MQ-2 & GPIO4 & 可燃气体 \\
         \bottomrule
-      \end{tabular}}
+      \end{tabular}}\\[5pt]
+      {\scriptsize\color{black!50} 每类传感器独立采集函数、主程序统一调度，新增传感器不动主结构。}
     \end{column}
-    \begin{column}{0.46\textwidth}
-      \textbf{\footnotesize Wi-Fi 配网（AP + WiFiManager）}
-      {\footnotesize
-      \begin{itemize}\itemsep=4pt
-        \item 不写死 Wi-Fi；首次或失败进入配网热点
-        \item 手机/PC 打开网页，选择 Wi-Fi 并保存
-        \item 换实验室或热点免改代码、免重烧录
-      \end{itemize}}
+    \begin{column}{0.58\textwidth}
+      \centering
+      \textbf{\footnotesize 开发板与传感器整体接线}\\[2pt]
+      \includegraphics[width=\linewidth, height=0.50\textheight, keepaspectratio]{images/hw_wiring.png}
     \end{column}
   \end{columns}
-  \vfill
-  \begin{center}\small\color{black!55}
-    每类传感器独立采集函数、主程序统一调度——新增传感器不动主结构。
-  \end{center}
-\end{frame}
-
-\begin{frame}{硬件节点：运行流程}
-  \vspace{14pt}
+  \vspace{4pt}
   \begin{center}
     \begin{tikzpicture}[
         b/.style={draw=black!50, rounded corners=2pt, fill=black!4, align=center,
-                  font=\scriptsize, minimum height=0.9cm, minimum width=2.3cm, inner sep=3pt},
+                  font=\scriptsize, minimum height=0.6cm, minimum width=1.32cm, inner sep=1pt},
         hub/.style={b, fill=mLightBrown!12, draw=mLightBrown},
-        a/.style={-{Stealth[length=2mm]}, black!55, semithick}]
+        a/.style={-{Stealth[length=1.6mm]}, black!55, semithick}]
       \node[b] (s1) {启动};
-      \node[b, right=0.45cm of s1] (s2) {初始化\\\scriptsize 串口/传感器/配网};
-      \node[b, right=0.45cm of s2] (s3) {连接 Wi-Fi};
-      \node[b, right=0.45cm of s3] (s4) {NTP 时间同步};
-      \node[hub, below=0.8cm of s4] (s5) {连接 MQTT};
-      \node[b, left=0.45cm of s5] (s6) {周期采集 30 s};
-      \node[b, left=0.45cm of s6] (s7) {JSON 封装};
-      \node[b, left=0.45cm of s7] (s8) {发布上传};
-      \draw[a] (s1)--(s2); \draw[a] (s2)--(s3); \draw[a] (s3)--(s4); \draw[a] (s4)--(s5);
-      \draw[a] (s5)--(s6); \draw[a] (s6)--(s7); \draw[a] (s7)--(s8);
-    \end{tikzpicture}
+      \node[b, right=0.22cm of s1] (s2) {初始化};
+      \node[b, right=0.22cm of s2] (s3) {连 Wi-Fi};
+      \node[b, right=0.22cm of s3] (s4) {NTP};
+      \node[hub, right=0.22cm of s4] (s5) {连 MQTT};
+      \node[b, right=0.22cm of s5] (s6) {周期采集};
+      \node[b, right=0.22cm of s6] (s7) {JSON};
+      \node[b, right=0.22cm of s7] (s8) {发布};
+      \draw[a] (s1)--(s2);\draw[a] (s2)--(s3);\draw[a] (s3)--(s4);\draw[a] (s4)--(s5);
+      \draw[a] (s5)--(s6);\draw[a] (s6)--(s7);\draw[a] (s7)--(s8);
+    \end{tikzpicture}\\[3pt]
+    {\scriptsize\color{black!55} 硬件节点程序流程：Wi-Fi 与 NTP 就绪后才上传带时间戳数据；断网 / MQTT 断开自动重连续传}
   \end{center}
-  \takeaway{仅当 Wi-Fi 与 NTP 时间同步就绪才上传带时间戳数据；断网或 MQTT 断开自动重连后续传}
+\end{frame}
+
+\begin{frame}{Wi-Fi 配网与网络接入}
+  \vspace{2pt}
+  \begin{columns}[c]
+    \begin{column}{0.54\textwidth}
+      \centering\textbf{\footnotesize WiFiManager 配网流程}\\[4pt]
+      \begin{tikzpicture}[node distance=3.2mm,
+          b/.style={draw=black!50, rounded corners=2pt, fill=black!4, align=center, font=\tiny, text width=3.4cm, inner sep=3pt},
+          d/.style={draw=mLightBrown, fill=mLightBrown!14, align=center, font=\tiny, text width=2.0cm, inner sep=3pt},
+          ap/.style={draw=black!50, rounded corners=2pt, fill=black!4, align=center, font=\tiny, text width=3.0cm, inner sep=3pt},
+          a/.style={-{Stealth[length=1.6mm]}, black!55, semithick}]
+        \node[b] (n1) {系统启动 → 初始化 Wi-Fi 配网模块};
+        \node[b, below=of n1] (n2) {尝试连接已保存 Wi-Fi};
+        \node[d, below=of n2] (n3) {连接成功？};
+        \node[b, below=of n3] (n4) {输出 IP / 网关 / RSSI\\ → NTP 同步 → MQTT 连接 → 周期上传};
+        \node[ap, right=1.0cm of n3] (m1) {开启 ESP32C3\_Config 热点\\ → 访问 192.168.4.1 选 Wi-Fi\\ → 保存并连接目标网络};
+        \draw[a] (n1)--(n2); \draw[a] (n2)--(n3);
+        \draw[a] (n3)-- node[left, font=\tiny, black!55] {是} (n4);
+        \draw[a] (n3)-- node[above, font=\tiny, black!55] {否} (m1);
+        \draw[a] (m1) |- (n2);
+      \end{tikzpicture}
+    \end{column}
+    \begin{column}{0.44\textwidth}
+      \centering
+      \includegraphics[width=0.72\linewidth, height=0.36\textheight, keepaspectratio]{images/hw_portal1.jpg}\\[2pt]
+      {\scriptsize\color{black!55} 配网门户：网页选择 Wi-Fi}\\[6pt]
+      \includegraphics[width=\linewidth, height=0.24\textheight, keepaspectratio]{images/hw_wifi_ok.png}\\[2pt]
+      {\scriptsize\color{black!55} 成功接入：ESP32 获 192.168.137.81}
+    \end{column}
+  \end{columns}
+  \takeaway{WiFiManager 配网机制解决了固定 Wi-Fi 不便维护的问题，使 ESP32-C3 节点具备换网配置、自动连接与断线恢复能力}
 \end{frame}
 
 \begin{frame}{整链路真机验证 · ESP32 长时测试}
@@ -500,6 +532,25 @@
     \textcolor{mLightBrown}{\checkmark}~\textbf{带宽}：需求 26.4 Mbps（留余量 ~33）< 校园网 \textbf{100 Mbps}，约 1/3 占用\\[3pt]
     \textcolor{mLightBrown}{\checkmark}~\textbf{存储}：约 11.5 GB/天，30 天 \textbf{345 GB} → 配 ≥400 GB 盘（保留更久则降采样）
   \end{block}
+\end{frame}
+
+\begin{frame}{实测佐证 · 实景压测（1/2）：连接零掉线 · 转发满速}
+  {\footnotesize\color{black!60} 正是按本案例规模（2 万连接）做的实景压测：}
+  \statline{2 万连接 \quad·\quad 30 min 零掉线 \quad·\quad 送达 99.96\%}
+  \vspace{2pt}
+  \begin{center}
+    \includegraphics[width=0.88\textwidth, height=0.32\textheight, keepaspectratio]{images/exp_stress_conn.png}\\[8pt]
+    \includegraphics[width=0.88\textwidth, height=0.32\textheight, keepaspectratio]{images/exp_stress_tput.png}
+  \end{center}
+\end{frame}
+
+\begin{frame}{实测佐证 · 实景压测（2/2）：资源占用极低}
+  \vspace{4pt}
+  \begin{center}
+    \includegraphics[width=0.88\textwidth, height=0.32\textheight, keepaspectratio]{images/exp_stress_cpu.png}\\[8pt]
+    \includegraphics[width=0.88\textwidth, height=0.32\textheight, keepaspectratio]{images/exp_stress_mem.png}
+  \end{center}
+  \takeaway{2 万连接满载仅 CPU 约 1.1 核 · 内存约 1.5 GB —— 资源占用极低，与容量建模预测吻合}
 \end{frame}
 
 % ============================================================
