@@ -41,6 +41,12 @@ SIM_PROFILES = {
     "soil_moisture": {"unit": "%", "base": 45.0, "revert": 0.05, "sigma": 1.5, "min": 0.0, "max": 100.0, "ndigits": 1},
 }
 
+# `smoke` is the canonical MQ-2 gas name used by the real ESP32 firmware and the
+# 6-15 field-test data; `mq2_gas` is an equivalent alias (Issue #34 era) kept above
+# for backward compatibility. Both render as "可燃气体" in the monitor, so the default
+# set publishes only `smoke` to avoid a duplicate "可燃气体" row.
+DEFAULT_TYPES = "temperature,humidity,light,noise,smoke,soil_moisture"
+
 
 def parse_csv(value: str) -> list[str]:
     return [item.strip() for item in value.split(",") if item.strip()]
@@ -51,7 +57,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--node-id", default="node01", help="Node id, e.g. node01.")
     parser.add_argument(
         "--types",
-        default=",".join(SIM_PROFILES),
+        default=DEFAULT_TYPES,
         help="Comma-separated data types to publish, e.g. temperature,humidity.",
     )
     parser.add_argument("--interval", type=float, default=5.0, help="Publish interval in seconds.")
