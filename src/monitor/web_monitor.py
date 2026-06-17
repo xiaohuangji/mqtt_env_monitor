@@ -19,7 +19,7 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 import paho.mqtt.client as mqtt
-from flask import Flask, Response, jsonify, render_template
+from flask import Flask, Response, jsonify, render_template, request
 
 # Sizing-calculator coefficients, calibrated by the capture/load experiments
 # (see docs/project_outputs/课程设计报告/网络负载与成本建模.md §10).
@@ -251,6 +251,20 @@ def build_mqtt_client(state: MonitorState) -> mqtt.Client:
     return client
 
 
+def topic_matches(topic_filter: str, topic: str) -> bool:
+    """MQTT 主题过滤匹配：``+`` 匹配单层，``#`` 匹配其后所有层。"""
+    filter_parts = topic_filter.split("/")
+    topic_parts = topic.split("/")
+    for i, part in enumerate(filter_parts):
+        if part == "#":
+            return True
+        if i >= len(topic_parts):
+            return False
+        if part != "+" and part != topic_parts[i]:
+            return False
+    return len(filter_parts) == len(topic_parts)
+
+
 def build_app(state: MonitorState) -> Flask:
     app = Flask(__name__)
 
@@ -272,14 +286,23 @@ def build_app(state: MonitorState) -> Flask:
 
     @app.get("/stream")
     def stream() -> Response:
+        # 每个浏览器可自选要订阅的主题过滤（MQTT 通配 + / #）。后端始终订阅
+        # env_monitor/+/+ 拿到全量，这里按所选过滤只向该连接推送匹配的数据。
+        topic_filter = (request.args.get("filter") or "").strip() or state.args.topic
+
         def generate():
             q = state.register()
             try:
-                yield "event: snapshot\ndata: " + json.dumps(state.snapshot(), ensure_ascii=False) + "\n\n"
+                snap = state.snapshot()
+                snap["topic"] = topic_filter
+                snap["entries"] = [e for e in snap["entries"]
+                                   if topic_matches(topic_filter, str(e["topic"]))]
+                yield "event: snapshot\ndata: " + json.dumps(snap, ensure_ascii=False) + "\n\n"
                 while True:
                     try:
                         update = q.get(timeout=15)
-                        yield "event: update\ndata: " + json.dumps(update, ensure_ascii=False) + "\n\n"
+                        if topic_matches(topic_filter, str(update["entry"]["topic"])):
+                            yield "event: update\ndata: " + json.dumps(update, ensure_ascii=False) + "\n\n"
                     except queue.Empty:
                         yield ": keepalive\n\n"
             finally:

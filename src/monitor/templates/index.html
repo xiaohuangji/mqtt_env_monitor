@@ -31,6 +31,12 @@
   .conn.ok { color: var(--green); background: rgba(0,214,143,.12); border: 1px solid rgba(0,214,143,.30); }
   .conn.bad { color: var(--red); background: rgba(255,107,107,.12); border: 1px solid rgba(255,107,107,.30); }
 
+  .subbar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; font-size: 13px; color: var(--txt2); }
+  .subbar label { display: inline-flex; align-items: center; gap: 6px; }
+  .subbar select { background: var(--card2); color: var(--txt); border: 1px solid var(--line); border-radius: 7px; padding: 4px 9px; font-size: 13px; }
+  .subbar select:focus { outline: none; border-color: var(--blue); }
+  .subbar .flt { color: var(--cyan); background: rgba(63,210,224,.08); border: 1px solid var(--line); border-radius: 6px; padding: 3px 9px; font-size: 12.5px; font-family: ui-monospace, Consolas, monospace; }
+
   .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 14px; }
   .kpi { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 14px 18px; }
   .kpi .t { font-size: 12px; color: var(--txt2); margin-bottom: 7px; }
@@ -77,6 +83,13 @@
     <span>MQTT Broker <b id="broker">-</b></span>
     <span>订阅主题 <b id="topic">-</b></span>
     <span class="conn bad" id="conn"><i></i> 连接中…</span>
+  </div>
+
+  <div class="subbar">
+    <span>选择订阅</span>
+    <label>节点 <select id="selNode"><option value="+">全部</option></select></label>
+    <label>数据类型 <select id="selType"><option value="+">全部</option></select></label>
+    <span class="flt" id="filterShow">env_monitor/+/+</span>
   </div>
 
   <div class="kpis">
@@ -234,11 +247,62 @@
   // Re-render every second so status flips to stale without new messages.
   setInterval(render, 1000);
 
-  const source = new EventSource("/stream");
-  source.addEventListener("snapshot", (ev) => applySnapshot(JSON.parse(ev.data)));
-  source.addEventListener("update", (ev) => applyUpdate(JSON.parse(ev.data)));
-  source.onopen = () => setConn("已连接", true);
-  source.onerror = () => setConn("连接中断，自动重连中…", false);
+  // ---- 选择订阅：按所选主题过滤重连 SSE（后端按 MQTT 通配过滤该连接）----
+  let source = null;
+  function currentFilter() {
+    const n = document.getElementById("selNode").value || "+";
+    const d = document.getElementById("selType").value || "+";
+    return "env_monitor/" + n + "/" + d;
+  }
+  function connect(filter) {
+    if (source) source.close();
+    entries.clear();
+    render();
+    source = new EventSource("/stream?filter=" + encodeURIComponent(filter));
+    source.addEventListener("snapshot", (ev) => applySnapshot(JSON.parse(ev.data)));
+    source.addEventListener("update", (ev) => applyUpdate(JSON.parse(ev.data)));
+    source.onopen = () => setConn("已连接", true);
+    source.onerror = () => setConn("连接中断，自动重连中…", false);
+  }
+  function applyFilter() {
+    const f = currentFilter();
+    document.getElementById("filterShow").textContent = f;
+    connect(f);
+  }
+  document.getElementById("selNode").addEventListener("change", applyFilter);
+  document.getElementById("selType").addEventListener("change", applyFilter);
+
+  function fillTypeOptions(typeNamesObj) {
+    const sel = document.getElementById("selType");
+    const have = new Set(Array.from(sel.options).map((o) => o.value));
+    Object.keys(typeNamesObj || {}).forEach((k) => {
+      if (!have.has(k)) {
+        const o = document.createElement("option");
+        o.value = k; o.textContent = (typeNamesObj[k] || k);
+        sel.appendChild(o);
+      }
+    });
+  }
+  // 节点/类型选项来自全量快照（/api/data，不受当前过滤影响），定期刷新
+  async function refreshOptions() {
+    try {
+      const data = await (await fetch("/api/data")).json();
+      fillTypeOptions(data.type_names);
+      const sel = document.getElementById("selNode");
+      const have = new Set(Array.from(sel.options).map((o) => o.value));
+      Array.from(new Set((data.entries || []).map((e) => e.node_id))).sort().forEach((n) => {
+        if (!have.has(n)) {
+          const o = document.createElement("option");
+          o.value = n; o.textContent = n;
+          sel.appendChild(o);
+        }
+      });
+    } catch (e) { /* ignore */ }
+  }
+  refreshOptions();
+  setInterval(refreshOptions, 5000);
+
+  connect(currentFilter());
 </script>
 </body>
 </html>
